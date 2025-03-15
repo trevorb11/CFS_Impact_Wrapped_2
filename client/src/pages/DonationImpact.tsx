@@ -401,31 +401,58 @@ export default class DonationImpactPage extends Component<RouteComponentProps, D
       donorEmail: email || this.state.donorEmail
     });
 
+    // Log the donation attempt to the server (if there's an email)
+    if (email) {
+      // This is non-blocking, so we don't wait for it
+      this.logDonation(amount, email).catch(error => 
+        console.error("Failed to log donation:", error)
+      );
+    }
+
+    // Prepare data for secure impact calculation
+    const donorData = {
+      email,
+      amount,
+      donationDate: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD format
+      // If we have wrapped donor data in session storage, include that too
+      ...JSON.parse(sessionStorage.getItem('wrappedDonorData') || '{}')
+    };
+
     // Navigate to impact page if we're not already there
     if (window.location.pathname !== '/impact') {
-      // Get current URL parameters and ensure they are preserved
-      const { originalParamString } = getParamsFromURL();
-
-      // Build the URL with parameters
-      const destinationUrl = `/impact${originalParamString ? '?' + originalParamString : ''}`;
-      console.log("Navigating to:", destinationUrl);
-
-      // Use pushState to navigate without losing parameters
-      window.history.pushState({}, '', destinationUrl);
-    } else {
-      // Already on impact page, make sure we preserve the donorUI parameter
-      const urlParams = new URLSearchParams(window.location.search);
-      const useDonorUI = urlParams.get('donorUI') === 'true';
-      
-      if (useDonorUI) {
-        // Make sure the URL still has the donorUI parameter
-        if (!window.location.search.includes('donorUI=true')) {
-          // Add the parameter
-          const newUrl = `${window.location.pathname}?donorUI=true`;
-          window.history.pushState({}, '', newUrl);
-          console.log("Preserving donorUI parameter in URL:", newUrl);
-        }
+      // Use encrypted URL if we have donor data worth encrypting
+      if (email || Object.keys(donorData).length > 3) { // If we have more than just the basic fields
+        // Import using a different approach to avoid potential circular dependencies
+        import('@/lib/security-utils').then(({ createSecureUrl }) => {
+          const baseUrl = `${window.location.origin}/impact`;
+          const secureUrl = createSecureUrl('/impact', donorData);
+          
+          console.log("Navigating to secure URL for donation impact");
+          
+          // Use pushState to navigate
+          window.history.pushState({}, '', secureUrl);
+          
+          // Now handle the calculation
+          this.calculateImpact(amount);
+        });
+      } else {
+        // Simple URL with just parameters
+        const params = new URLSearchParams();
+        if (email) params.append('email', email);
+        params.append('amount', amount.toString());
+        
+        const destinationUrl = `/impact${params.toString() ? '?' + params.toString() : ''}`;
+        console.log("Navigating to standard URL:", destinationUrl);
+        
+        // Use pushState to navigate
+        window.history.pushState({}, '', destinationUrl);
+        
+        // Calculate impact
+        this.calculateImpact(amount);
       }
+    } else {
+      // Already on impact page, just refresh the calculation
+      this.calculateImpact(amount);
     }
 
     // Simulate loading for better user experience
@@ -739,54 +766,100 @@ isLastSlide() {
    * Handle sharing functionality
    */
   handleShare() {
-    // First check if we have stored URL parameters
-    const storedParams = sessionStorage.getItem('originalUrlParams');
     const baseUrl = window.location.origin + '/impact';
     let shareUrl = window.location.href;
     
-    // If we're on the impact page without parameters but have stored parameters
-    if (storedParams && storedParams.length > 0) {
-      // Use the stored original parameters
-      shareUrl = `${baseUrl}?${storedParams}`;
-      console.log("Using original parameters for share URL:", shareUrl);
-    } 
-    // If no stored parameters but we have donor email
-    else if (this.state.donorEmail && !window.location.href.includes('?')) {
-      // Just use the email parameter as fallback
-      shareUrl = `${baseUrl}?email=${encodeURIComponent(this.state.donorEmail)}`;
-      console.log("Using email only for share URL:", shareUrl);
+    // Prepare donor data to share in a secure way
+    const donorData: Record<string, any> = {
+      amount: this.state.amount,
+    };
+    
+    // Add donor email if available
+    if (this.state.donorEmail) {
+      donorData.email = this.state.donorEmail;
     }
     
-    // Prepare the sharing message
-    const shareTitle = "My Donation Impact at Community Food Share";
-    const shareText = `I just donated $${this.state.amount} to Community Food Share, providing ${this.state.impact?.mealsProvided} meals and helping ${this.state.impact?.peopleServed} people in our community!`;
+    // Add donor first name if available
+    const firstName = sessionStorage.getItem('donorFirstName');
+    if (firstName) {
+      donorData.firstName = firstName;
+    }
     
-    console.log("Sharing URL:", shareUrl);
+    // Check if we have wrapped donor data in session storage
+    const wrappedDataString = sessionStorage.getItem('wrappedDonorData');
+    if (wrappedDataString) {
+      try {
+        // Merge with wrapped data but filter out sensitive information
+        const wrappedData = JSON.parse(wrappedDataString);
+        // Include summary donation information only
+        if (wrappedData.lastGiftAmount) donorData.lastGiftAmount = wrappedData.lastGiftAmount;
+        if (wrappedData.lifetimeGiving) donorData.lifetimeGiving = wrappedData.lifetimeGiving;
+        if (wrappedData.totalGifts) donorData.totalGifts = wrappedData.totalGifts;
+        if (wrappedData.consecutiveYearsGiving) donorData.consecutiveYearsGiving = wrappedData.consecutiveYearsGiving;
+      } catch (error) {
+        console.error("Error parsing wrapped donor data:", error);
+      }
+    }
     
-    // Use Web Share API if available
-    if (navigator.share) {
-      navigator.share({
-        title: shareTitle,
-        text: shareText,
-        url: shareUrl,
-      }).catch(() => {
-        // Save to clipboard as fallback
+    // Create secure URL for sharing
+    import('@/lib/security-utils').then(({ createSecureUrl }) => {
+      // Create secure URL with donor data
+      shareUrl = createSecureUrl('/impact', donorData);
+      console.log("Created secure URL for sharing:", shareUrl);
+      
+      // Prepare the sharing message
+      const shareTitle = "My Donation Impact at Community Food Share";
+      const shareText = `I just donated $${this.state.amount} to Community Food Share, providing ${this.state.impact?.mealsProvided} meals and helping ${this.state.impact?.peopleServed} people in our community!`;
+      
+      // Use Web Share API if available
+      if (navigator.share) {
+        navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl,
+        }).catch(() => {
+          // Save to clipboard as fallback
+          navigator.clipboard.writeText(shareUrl).then(() => {
+            toast({
+              title: "Share your impact",
+              description: "Share URL copied to clipboard. Share it with your friends!",
+            });
+          });
+        });
+      } else {
+        // For browsers without Web Share API, copy to clipboard
         navigator.clipboard.writeText(shareUrl).then(() => {
           toast({
             title: "Share your impact",
             description: "Share URL copied to clipboard. Share it with your friends!",
           });
         });
-      });
-    } else {
-      // For browsers without Web Share API, copy to clipboard
-      navigator.clipboard.writeText(shareUrl).then(() => {
+      }
+    }).catch(error => {
+      console.error("Error creating secure URL:", error);
+      
+      // Fallback to original URL if encryption fails
+      console.log("Using fallback URL for sharing:", shareUrl);
+      
+      // Prepare the sharing message
+      const shareTitle = "My Donation Impact at Community Food Share";
+      const shareText = `I just donated $${this.state.amount} to Community Food Share, providing ${this.state.impact?.mealsProvided} meals and helping ${this.state.impact?.peopleServed} people in our community!`;
+      
+      // Share with fallback URL
+      if (navigator.share) {
+        navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl,
+        }).catch(() => navigator.clipboard.writeText(shareUrl));
+      } else {
+        navigator.clipboard.writeText(shareUrl);
         toast({
           title: "Share your impact",
           description: "Share URL copied to clipboard. Share it with your friends!",
         });
-      });
-    }
+      }
+    });
   }
   
   render() {
