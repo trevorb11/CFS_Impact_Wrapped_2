@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "wouter";
+import { createSecureUrl } from "@/lib/security-utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 /**
  * TestUrl component
@@ -29,13 +31,16 @@ export default function TestUrl() {
   });
 
   const [generatedUrl, setGeneratedUrl] = useState<string>("");
+  const [secureUrl, setSecureUrl] = useState<string>("");
+  const [urlType, setUrlType] = useState<"standard" | "secure">("standard");
 
-  // When any of the donor info changes, generate a new URL
+  // When any of the donor info changes, generate new URLs
   useEffect(() => {
     generateUrl();
+    generateSecureUrl();
   }, [donorInfo]);
 
-  // Generate a URL with the current donor info
+  // Generate a standard URL with the current donor info
   const generateUrl = () => {
     const params = new URLSearchParams();
     
@@ -51,6 +56,29 @@ export default function TestUrl() {
     
     // Set the generated URL
     setGeneratedUrl(`${baseUrl}?${params.toString()}`);
+  };
+  
+  // Generate a secure URL with encrypted donor info
+  const generateSecureUrl = () => {
+    // Filter out empty values and convert string numbers to actual numbers
+    const processedDonorInfo: Record<string, string | number> = {};
+    
+    Object.entries(donorInfo).forEach(([key, value]) => {
+      if (value.trim()) {
+        // Convert numeric strings to numbers for better data handling
+        if (!isNaN(Number(value)) && key !== 'email') {
+          processedDonorInfo[key] = Number(value);
+        } else {
+          processedDonorInfo[key] = value;
+        }
+      }
+    });
+    
+    // Create a secure URL with encrypted data
+    const baseUrl = window.location.origin + "/impact";
+    const url = createSecureUrl(baseUrl, processedDonorInfo);
+    
+    setSecureUrl(url);
   };
 
   // Handle form field changes
@@ -230,32 +258,55 @@ export default function TestUrl() {
           </CardContent>
           
           <CardFooter className="flex flex-col space-y-4">
-            <div className="w-full p-3 bg-gray-50 rounded-md border border-gray-200 overflow-x-auto">
-              <p className="font-mono text-sm text-gray-800 break-all">
-                {generatedUrl}
-              </p>
-            </div>
+            <Tabs defaultValue="standard" className="w-full" onValueChange={(value) => setUrlType(value as "standard" | "secure")}>
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="standard">Standard URL</TabsTrigger>
+                <TabsTrigger value="secure">Secure URL (Encrypted)</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="standard">
+                <div className="w-full p-3 bg-gray-50 rounded-md border border-gray-200 overflow-x-auto">
+                  <p className="font-mono text-sm text-gray-800 break-all">
+                    {generatedUrl}
+                  </p>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="secure">
+                <div className="w-full p-3 bg-gray-50 rounded-md border border-gray-200 overflow-x-auto">
+                  <p className="font-mono text-sm text-gray-800 break-all">
+                    {secureUrl}
+                  </p>
+                  <div className="mt-2 text-sm text-emerald-600 bg-emerald-50 p-2 rounded">
+                    <p className="font-semibold">✓ Data is encrypted in URL</p>
+                    <p className="text-xs text-emerald-700 mt-1">Donor information is protected and not visible in plain text</p>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
             
             <div className="flex justify-between w-full">
-              <Button variant="outline" onClick={generateUrl}>
+              <Button variant="outline" onClick={urlType === "standard" ? generateUrl : generateSecureUrl}>
                 Regenerate URL
               </Button>
               
               <div className="space-x-2">
                 <Button variant="outline" onClick={() => {
-                  navigator.clipboard.writeText(generatedUrl);
+                  navigator.clipboard.writeText(urlType === "standard" ? generatedUrl : secureUrl);
                 }}>
                   Copy URL
                 </Button>
                 
                 <Button asChild>
-                  <a href={generatedUrl} target="_blank" rel="noopener noreferrer">
+                  <a href={urlType === "standard" ? generatedUrl : secureUrl} target="_blank" rel="noopener noreferrer">
                     Open in New Tab
                   </a>
                 </Button>
                 
                 <Button asChild variant="default">
-                  <Link href={`/impact?${new URLSearchParams(donorInfo).toString()}`}>
+                  <Link href={urlType === "standard" ? 
+                    `/impact?${new URLSearchParams(donorInfo).toString()}` : 
+                    secureUrl.replace(window.location.origin, '')}>
                     Navigate to Impact Page
                   </Link>
                 </Button>

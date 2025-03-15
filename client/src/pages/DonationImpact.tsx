@@ -28,14 +28,53 @@ import { apiRequest } from "@/lib/queryClient";
 import type { DonationImpact as DonationImpactType } from "@/types/donation";
 import { calculateDonationImpact } from "@/lib/donation-calculator";
 import { SLIDE_CONFIG } from "@/lib/constants";
+import { decryptData } from "@/lib/security-utils";
 
 /**
  * Gets parameters from the URL
  * Handles both email parameter and donor wrapped data parameters
+ * as well as encrypted data in the 'data' parameter
  * Returns all URL parameters for preservation during navigation
  */
 function getParamsFromURL() {
   const params = new URLSearchParams(window.location.search);
+  
+  // Check for encrypted data parameter first
+  const encryptedData = params.get('data');
+  if (encryptedData) {
+    try {
+      console.log("Found encrypted data, attempting to decrypt...");
+      const decryptedData = decryptData(encryptedData);
+      console.log("Successfully decrypted donor data:", decryptedData);
+      
+      // Store decrypted data in session storage for later use
+      sessionStorage.setItem('secureWrappedDonorData', JSON.stringify(decryptedData));
+      
+      // Extract firstName and email from the decrypted data if available
+      const email = decryptedData.email || null;
+      const firstName = decryptedData.firstName || decryptedData.first_name || null;
+      
+      // Return the decrypted data as wrappedData
+      return {
+        email,
+        firstName,
+        hasWrappedData: true,
+        wrappedData: decryptedData,
+        allParams: decryptedData,
+        originalParamString: params.toString(),
+        isEncrypted: true
+      };
+    } catch (error) {
+      console.error("Error decrypting donor data:", error);
+      toast({
+        title: "Error",
+        description: "Could not decrypt donor data. The URL may be invalid.",
+        variant: "destructive",
+      });
+    }
+  }
+  
+  // If no encrypted data or decryption failed, proceed with standard parameter handling
   
   // Get donor email if available
   const email = params.get('email');
@@ -120,7 +159,8 @@ function getParamsFromURL() {
     hasWrappedData,
     wrappedData,
     allParams,
-    originalParamString: params.toString() // Keep the original param string for URL preservation
+    originalParamString: params.toString(), // Keep the original param string for URL preservation
+    isEncrypted: false
   };
 }
 
