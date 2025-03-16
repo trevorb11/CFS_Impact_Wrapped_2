@@ -6,11 +6,8 @@
  */
 import CryptoJS from 'crypto-js';
 
-// The encryption key - in a real production environment, this should be:
-// 1. Stored securely (e.g., environment variable)
-// 2. Complex and unique to your application
-// 3. Rotated periodically
-const ENCRYPTION_KEY = 'COMMUNITY_FOOD_SHARE_APP_KEY_2025';
+// Get encryption key from environment variables
+const ENCRYPTION_KEY = import.meta.env.VITE_ENCRYPTION_KEY;
 
 /**
  * Encrypts an object to a URL-safe string
@@ -40,8 +37,75 @@ export function encryptData(data: any): string {
  * @param encryptedData - The encrypted URL-safe string
  * @returns The decrypted data object
  */
-export function decryptData(encryptedData: string): any {
+interface DonorData {
+  firstName?: string;
+  email?: string;
+  firstGiftDate?: string;
+  lastGiftDate?: string;
+  lastGiftAmount?: number;
+  lifetimeGiving?: number;
+  consecutiveYearsGiving?: number;
+  totalGifts?: number;
+  largestGiftAmount?: number;
+  largestGiftDate?: string;
+  givingFY22?: number;
+  givingFY23?: number;
+  givingFY24?: number;
+  givingFY25?: number;
+}
+
+/**
+ * Validates decrypted donor data
+ * @param data - The decrypted data to validate
+ * @returns boolean indicating if data is valid
+ */
+function validateDonorData(data: any): data is DonorData {
+  // Check if data is an object
+  if (!data || typeof data !== 'object') return false;
+
+  // Validate string fields
+  const stringFields = ['firstName', 'email', 'firstGiftDate', 'lastGiftDate', 'largestGiftDate'];
+  for (const field of stringFields) {
+    if (field in data && typeof data[field] !== 'string') return false;
+  }
+
+  // Validate numeric fields
+  const numericFields = [
+    'lastGiftAmount', 'lifetimeGiving', 'consecutiveYearsGiving', 'totalGifts',
+    'largestGiftAmount', 'givingFY22', 'givingFY23', 'givingFY24', 'givingFY25'
+  ];
+  for (const field of numericFields) {
+    if (field in data && typeof data[field] !== 'number') return false;
+  }
+
+  // Validate date formats if present
+  const dateFields = ['firstGiftDate', 'lastGiftDate', 'largestGiftDate'];
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$|^\d{2}\/\d{2}\/\d{4}$/;
+  for (const field of dateFields) {
+    if (field in data && !dateRegex.test(data[field])) return false;
+  }
+
+  // Validate email format if present
+  if ('email' in data && data.email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email)) return false;
+  }
+
+  // Validate numeric ranges
+  if ('lifetimeGiving' in data && data.lifetimeGiving < 0) return false;
+  if ('lastGiftAmount' in data && data.lastGiftAmount < 0) return false;
+  if ('largestGiftAmount' in data && data.largestGiftAmount < 0) return false;
+
+  return true;
+}
+
+export function decryptData(encryptedData: string): DonorData {
   try {
+    // Check if encryption key is available
+    if (!ENCRYPTION_KEY) {
+      throw new Error('Encryption key not found');
+    }
+
     // Decode the URL-safe string back to the encrypted string
     const encrypted = atob(encryptedData);
     
@@ -49,10 +113,17 @@ export function decryptData(encryptedData: string): any {
     const decrypted = CryptoJS.AES.decrypt(encrypted, ENCRYPTION_KEY).toString(CryptoJS.enc.Utf8);
     
     // Parse the decrypted JSON back to an object
-    return JSON.parse(decrypted);
+    const data = JSON.parse(decrypted);
+
+    // Validate the decrypted data
+    if (!validateDonorData(data)) {
+      throw new Error('Invalid donor data format');
+    }
+
+    return data;
   } catch (error) {
     console.error('Error decrypting data:', error);
-    throw new Error('Failed to decrypt data');
+    throw new Error('Failed to decrypt data: ' + (error instanceof Error ? error.message : 'Unknown error'));
   }
 }
 
