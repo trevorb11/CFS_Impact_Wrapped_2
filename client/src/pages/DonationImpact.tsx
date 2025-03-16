@@ -36,7 +36,17 @@ import { decryptData } from "@/lib/security-utils";
  * as well as encrypted data in the 'data' parameter
  * Returns all URL parameters for preservation during navigation
  */
-function getParamsFromURL() {
+interface GetParamsResult {
+  email: string | null;
+  firstName: string | null;
+  hasWrappedData: boolean;
+  wrappedData: any;
+  allParams: Record<string, string | number | any>;
+  originalParamString: string;
+  isEncrypted: boolean;
+}
+
+function getParamsFromURL(): GetParamsResult {
   const params = new URLSearchParams(window.location.search);
   
   // Check for encrypted data parameter first
@@ -67,10 +77,18 @@ function getParamsFromURL() {
     } catch (error) {
       console.error("Error decrypting donor data:", error);
       toast({
-        title: "Error",
-        description: "Could not decrypt donor data. The URL may be invalid.",
+        title: "Security Error",
+        description: "Could not decrypt donor data. The URL may be invalid or has been tampered with.",
         variant: "destructive",
       });
+      
+      // Log more detailed info for debugging
+      if (error instanceof Error) {
+        console.error(`Decryption error details: ${error.message}`);
+      }
+      
+      // Continue with regular parameters if available
+      console.log("Falling back to standard parameter handling after decryption failure");
     }
   }
   
@@ -127,8 +145,8 @@ function getParamsFromURL() {
   // For wrapped data to be valid, we need at least:
   // 1. Either a last gift amount or lifetime giving
   // 2. At least one date field (first gift or last gift date)
-  const hasWrappedData = 
-    (hasLastGiftAmount || hasLifetimeGiving) && (
+  const hasWrappedData: boolean = 
+    !!(hasLastGiftAmount || hasLifetimeGiving) && !!(
       (firstGiftDate && firstGiftDate !== '*|FIRS_GIF_D|*') ||
       (lastGiftDate && lastGiftDate !== '*|LAS_GIF_DA|*')
     );
@@ -156,7 +174,7 @@ function getParamsFromURL() {
   return {
     email,
     firstName,
-    hasWrappedData,
+    hasWrappedData: !!hasWrappedData, // Ensure boolean type
     wrappedData,
     allParams,
     originalParamString: params.toString(), // Keep the original param string for URL preservation
@@ -248,21 +266,44 @@ export default class DonationImpactPage extends Component<RouteComponentProps, D
           console.log("Auto-encrypted URL parameters for security");
           
           // Now proceed with normal parameter handling
-          const { email, firstName, hasWrappedData, wrappedData, allParams, originalParamString, isEncrypted } = getParamsFromURL();
+          const result = getParamsFromURL();
           
           // Continue with parameter handling
-          this.handleURLParams(email, firstName, hasWrappedData, wrappedData, allParams, originalParamString);
+          this.handleURLParams(
+            result.email, 
+            result.firstName, 
+            result.hasWrappedData === true, 
+            result.wrappedData, 
+            result.allParams, 
+            result.originalParamString
+          );
         }).catch(error => {
           console.error("Error auto-encrypting URL:", error);
           
           // If encryption fails, continue with standard parameters
-          const { email, firstName, hasWrappedData, wrappedData, allParams, originalParamString } = getParamsFromURL();
-          this.handleURLParams(email, firstName, hasWrappedData, wrappedData, allParams, originalParamString);
+          const result = getParamsFromURL();
+          
+          this.handleURLParams(
+            result.email, 
+            result.firstName, 
+            result.hasWrappedData === true, 
+            result.wrappedData, 
+            result.allParams, 
+            result.originalParamString
+          );
         });
       } else {
         // URL doesn't need encryption or is already encrypted, proceed normally
-        const { email, firstName, hasWrappedData, wrappedData, allParams, originalParamString } = getParamsFromURL();
-        this.handleURLParams(email, firstName, hasWrappedData, wrappedData, allParams, originalParamString);
+        const result = getParamsFromURL();
+        
+        this.handleURLParams(
+          result.email, 
+          result.firstName, 
+          result.hasWrappedData === true, 
+          result.wrappedData, 
+          result.allParams, 
+          result.originalParamString
+        );
       }
     }, 100); // Small delay to ensure URL is fully updated
   }
@@ -271,7 +312,7 @@ export default class DonationImpactPage extends Component<RouteComponentProps, D
    * Handle URL parameters once they've been processed
    */
   handleURLParams(email: string | null, firstName: string | null, hasWrappedData: boolean, 
-                 wrappedData: any, allParams: Record<string, string>, originalParamString: string) {
+                 wrappedData: any, allParams: Record<string, string | number | any>, originalParamString: string) {
     // Store original parameters in sessionStorage for future navigation
     if (originalParamString) {
       sessionStorage.setItem('originalUrlParams', originalParamString);
