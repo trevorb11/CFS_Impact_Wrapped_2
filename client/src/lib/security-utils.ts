@@ -5,18 +5,35 @@
  * to improve security when passing sensitive donor information in URLs.
  */
 import CryptoJS from 'crypto-js';
+import { toast } from '@/hooks/use-toast';
 
 // Get encryption key from environment variables
 const ENCRYPTION_KEY = import.meta.env.VITE_ENCRYPTION_KEY;
+
+// Check if encryption key is available and provide clear error if missing
+if (!ENCRYPTION_KEY) {
+  console.error('ENCRYPTION_KEY is not defined in environment variables!');
+  toast({
+    title: 'Configuration Error',
+    description: 'Encryption key is missing. Please contact the administrator.',
+    variant: 'destructive',
+  });
+}
 
 /**
  * Encrypts an object to a URL-safe string
  * 
  * @param data - The data object to encrypt
  * @returns An encrypted, URL-safe string
+ * @throws Error if encryption fails or if encryption key is missing
  */
 export function encryptData(data: any): string {
   try {
+    // Verify encryption key is available
+    if (!ENCRYPTION_KEY) {
+      throw new Error('ENCRYPTION_KEY environment variable is not defined');
+    }
+    
     // Convert the data to a JSON string
     const jsonString = JSON.stringify(data);
     
@@ -27,7 +44,12 @@ export function encryptData(data: any): string {
     return btoa(encrypted);
   } catch (error) {
     console.error('Error encrypting data:', error);
-    throw new Error('Failed to encrypt data');
+    toast({
+      title: 'Encryption Failed',
+      description: 'Could not encrypt donor data securely. Please try again or contact support.',
+      variant: 'destructive',
+    });
+    throw new Error('Failed to encrypt data: ' + (error instanceof Error ? error.message : 'Unknown error'));
   }
 }
 
@@ -37,8 +59,9 @@ export function encryptData(data: any): string {
  * @param encryptedData - The encrypted URL-safe string
  * @returns The decrypted data object
  */
-interface DonorData {
+export interface DonorData {
   firstName?: string;
+  first_name?: string; // Allow both camelCase and snake_case for compatibility
   email?: string;
   firstGiftDate?: string;
   lastGiftDate?: string;
@@ -99,30 +122,66 @@ function validateDonorData(data: any): data is DonorData {
   return true;
 }
 
+/**
+ * Decrypts a URL-safe string back to an object
+ * Provides comprehensive error handling and validation
+ * 
+ * @param encryptedData - The encrypted URL-safe string
+ * @returns The decrypted and validated donor data object
+ * @throws Error with detailed message if decryption fails
+ */
 export function decryptData(encryptedData: string): DonorData {
   try {
     // Check if encryption key is available
     if (!ENCRYPTION_KEY) {
+      toast({
+        title: 'Configuration Error',
+        description: 'Encryption key is missing. Please contact the administrator.',
+        variant: 'destructive',
+      });
       throw new Error('Encryption key not found');
     }
 
     // Decode the URL-safe string back to the encrypted string
-    const encrypted = atob(encryptedData);
+    let encrypted;
+    try {
+      encrypted = atob(encryptedData);
+    } catch (error) {
+      throw new Error('Invalid URL format: data is not properly base64 encoded');
+    }
     
     // Decrypt the string
-    const decrypted = CryptoJS.AES.decrypt(encrypted, ENCRYPTION_KEY).toString(CryptoJS.enc.Utf8);
+    let decrypted;
+    try {
+      decrypted = CryptoJS.AES.decrypt(encrypted, ENCRYPTION_KEY).toString(CryptoJS.enc.Utf8);
+      if (!decrypted) {
+        throw new Error('Decryption failed: Could not decrypt data with the provided key');
+      }
+    } catch (error) {
+      throw new Error('Decryption failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    }
     
     // Parse the decrypted JSON back to an object
-    const data = JSON.parse(decrypted);
+    let data;
+    try {
+      data = JSON.parse(decrypted);
+    } catch (error) {
+      throw new Error('Invalid data format: Decrypted content is not valid JSON');
+    }
 
     // Validate the decrypted data
     if (!validateDonorData(data)) {
-      throw new Error('Invalid donor data format');
+      throw new Error('Invalid donor data format: Data validation failed');
     }
 
     return data;
   } catch (error) {
     console.error('Error decrypting data:', error);
+    toast({
+      title: 'Decryption Failed',
+      description: 'Could not decrypt donor data. The URL may be invalid or tampered with.',
+      variant: 'destructive',
+    });
     throw new Error('Failed to decrypt data: ' + (error instanceof Error ? error.message : 'Unknown error'));
   }
 }

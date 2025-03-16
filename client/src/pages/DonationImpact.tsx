@@ -52,7 +52,7 @@ function getParamsFromURL() {
       
       // Extract firstName and email from the decrypted data if available
       const email = decryptedData.email || null;
-      const firstName = decryptedData.firstName || decryptedData.first_name || null;
+      const firstName = decryptedData.firstName || null;
       
       // Return the decrypted data as wrappedData
       return {
