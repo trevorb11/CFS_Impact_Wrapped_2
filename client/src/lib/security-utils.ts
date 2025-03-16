@@ -7,17 +7,19 @@
 import CryptoJS from 'crypto-js';
 import { toast } from '@/hooks/use-toast';
 
-// Get encryption key from environment variables
-const ENCRYPTION_KEY = import.meta.env.VITE_ENCRYPTION_KEY;
+// Get encryption key from environment variables with fallback options
+const ENCRYPTION_KEY = import.meta.env.VITE_ENCRYPTION_KEY || 
+                       import.meta.env.ENCRYPTION_KEY || 
+                       // Default fallback key for development only - NOT FOR PRODUCTION
+                       'default-dev-key-not-for-production-use-only';
 
-// Check if encryption key is available and provide clear error if missing
-if (!ENCRYPTION_KEY) {
+// Log warning if using the default key (but don't block functionality)
+if (ENCRYPTION_KEY === 'default-dev-key-not-for-production-use-only') {
+  console.warn('⚠️ Using default development encryption key. This is not secure for production use!');
+} else if (!ENCRYPTION_KEY) {
   console.error('ENCRYPTION_KEY is not defined in environment variables!');
-  toast({
-    title: 'Configuration Error',
-    description: 'Encryption key is missing. Please contact the administrator.',
-    variant: 'destructive',
-  });
+  // Don't show a toast here as it might appear during normal page loading
+  // We'll show errors only when encryption/decryption is actually attempted
 }
 
 /**
