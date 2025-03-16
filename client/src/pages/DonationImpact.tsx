@@ -196,6 +196,7 @@ export default class DonationImpactPage extends Component<RouteComponentProps, D
     this.isLastSlide = this.isLastSlide.bind(this);
     this.fetchDonorInfo = this.fetchDonorInfo.bind(this);
     this.handleShare = this.handleShare.bind(this);
+    this.handleURLParams = this.handleURLParams.bind(this);
   }
   
   /**
@@ -208,120 +209,180 @@ export default class DonationImpactPage extends Component<RouteComponentProps, D
     // Add a small delay to ensure URL is fully loaded
     setTimeout(() => {
       console.log("Checking URL parameters from current location:", window.location.href);
-      const { email, firstName, hasWrappedData, wrappedData, allParams, originalParamString } = getParamsFromURL();
       
-      // Store original parameters in sessionStorage for future navigation
-      if (originalParamString) {
-        sessionStorage.setItem('originalUrlParams', originalParamString);
-        console.log("Stored original URL parameters in session storage:", originalParamString);
-      }
+      // Check if the URL has standard parameters that should be encrypted
+      const currentUrl = window.location.href;
+      const urlParams = new URLSearchParams(window.location.search);
       
-      // Store firstName in sessionStorage if available
-      if (firstName) {
-        sessionStorage.setItem('donorFirstName', firstName);
-        console.log("Stored donor first name in session storage:", firstName);
-      }
+      // If the URL has sensitive parameters and no 'data' parameter, convert to secure URL 
+      const hasSensitiveParams = ['firstGiftDate', 'lastGiftDate', 'lastGiftAmount', 'lifetimeGiving', 
+                                 'consecutiveYearsGiving', 'totalGifts', 'largestGiftAmount'].some(param => 
+                                    urlParams.has(param));
       
-      // If we have wrapped data in the URL parameters, use it directly
-      if (hasWrappedData && wrappedData) {
-        console.log("Found wrapped donor data in URL, using directly:", wrappedData);
+      // Only auto-encrypt if URL has sensitive donor data and isn't already encrypted
+      if (hasSensitiveParams && !urlParams.has('data')) {
+        console.log("Detected standard URL with sensitive donor data, auto-encrypting...");
         
-        // Calculate impact based on last gift amount or lifetime giving
-        // If lastGiftAmount is available, use that as the donation amount
-        // If not, try to calculate an average gift from lifetime giving and total gifts
-        // If that's not possible either, fall back to a default value of 100
-        let amount = 100; // Default fallback value
-        
-        if (wrappedData.lastGiftAmount > 0) {
-          amount = wrappedData.lastGiftAmount;
-          console.log("Using lastGiftAmount for impact calculation:", amount);
-        } else if (wrappedData.lifetimeGiving > 0 && wrappedData.totalGifts > 0) {
-          amount = wrappedData.lifetimeGiving / wrappedData.totalGifts;
-          console.log("Calculated average gift amount from lifetime giving:", amount);
-        } else if (wrappedData.lifetimeGiving > 0) {
-          // If we have lifetime giving but no total gifts, use a reasonable portion of it
-          amount = wrappedData.lifetimeGiving * 0.1; // Use 10% of lifetime giving as a reasonable gift
-          amount = Math.min(amount, 1000); // Cap at $1000 to avoid extreme values
-          amount = Math.max(amount, 50);   // Ensure at least $50
-          console.log("Estimated gift amount from lifetime giving:", amount);
-        }
-        
-        // Round to 2 decimal places for currency
-        amount = Math.round(amount * 100) / 100;
-        
-        // Store the wrapped data in sessionStorage for later use
-        sessionStorage.setItem('wrappedDonorData', JSON.stringify(wrappedData));
-        
-        // Also store all URL parameters for retrieval by other components
-        sessionStorage.setItem('donorParams', JSON.stringify(allParams));
-        
-        // Calculate impact
-        this.setState({ 
-          isLoading: true,
-          step: SlideNames.LOADING,
-          donorEmail: email || null
+        // Convert all parameters to a data object
+        const paramsObj: Record<string, string | number> = {};
+        urlParams.forEach((value, key) => {
+          // Convert numeric values to numbers
+          if (!isNaN(Number(value)) && key !== 'email' && key !== 'firstName') {
+            paramsObj[key] = Number(value);
+          } else {
+            paramsObj[key] = value;
+          }
         });
         
-        // Simulate loading for better user experience
-        setTimeout(() => {
-          const impact = calculateDonationImpact(amount);
+        // Import security utils and create secure URL
+        import('@/lib/security-utils').then(({ createSecureUrl }) => {
+          // Get base path without query params
+          const basePath = window.location.pathname;
           
-          // Check if we're using donor UI (for logging purposes only)
-          const urlParams = new URLSearchParams(window.location.search);
-          const useDonorSlides = urlParams.get('donorUI') === 'true';
+          // Create new secure URL
+          const secureUrl = createSecureUrl(basePath, paramsObj);
           
-          // Always go to donor intro slide for wrapped data users
-          const nextStep = SlideNames.DONOR_INTRO;
+          // Replace current URL with secure version (without reloading page)
+          window.history.replaceState({}, '', secureUrl);
           
-          this.setState({
-            amount,
-            impact,
-            isLoading: false,
-            step: nextStep,
-          });
+          console.log("Auto-encrypted URL parameters for security");
           
-          toast({
-            title: "Welcome Back!",
-            description: "We've loaded your personalized donor information. Explore the impact of your generosity!",
-          });
+          // Now proceed with normal parameter handling
+          const { email, firstName, hasWrappedData, wrappedData, allParams, originalParamString, isEncrypted } = getParamsFromURL();
           
-          // Also call the server for more accurate impact calculation
-          this.calculateImpact(amount);
-        }, SLIDE_CONFIG.progressDuration);
-        
-        return;
-      }
-      
-      // If no wrapped data but we have an email, try to fetch from the server
-      if (email) {
-        console.log("Found email in URL, attempting to fetch donor info from server:", email);
-        sessionStorage.setItem('donorEmail', email); // Store email for other components
-        
-        this.fetchDonorInfo(email)
-          .then(success => {
-            if (success) {
-              toast({
-                title: "Welcome Back!",
-                description: "We've loaded your previous donation information. Explore the impact of your generosity!",
-              });
-            } else {
-              toast({
-                title: "Donor Not Found",
-                description: "We couldn't find donation information for the provided email. Please enter a donation amount to see its impact.",
-              });
-            }
-          });
-      }
-      
-      // Check for errors
-      if (this.state.error) {
-        toast({
-          title: "Error",
-          description: this.state.error,
-          variant: "destructive",
+          // Continue with parameter handling
+          this.handleURLParams(email, firstName, hasWrappedData, wrappedData, allParams, originalParamString);
+        }).catch(error => {
+          console.error("Error auto-encrypting URL:", error);
+          
+          // If encryption fails, continue with standard parameters
+          const { email, firstName, hasWrappedData, wrappedData, allParams, originalParamString } = getParamsFromURL();
+          this.handleURLParams(email, firstName, hasWrappedData, wrappedData, allParams, originalParamString);
         });
+      } else {
+        // URL doesn't need encryption or is already encrypted, proceed normally
+        const { email, firstName, hasWrappedData, wrappedData, allParams, originalParamString } = getParamsFromURL();
+        this.handleURLParams(email, firstName, hasWrappedData, wrappedData, allParams, originalParamString);
       }
     }, 100); // Small delay to ensure URL is fully updated
+  }
+  
+  /**
+   * Handle URL parameters once they've been processed
+   */
+  handleURLParams(email: string | null, firstName: string | null, hasWrappedData: boolean, 
+                 wrappedData: any, allParams: Record<string, string>, originalParamString: string) {
+    // Store original parameters in sessionStorage for future navigation
+    if (originalParamString) {
+      sessionStorage.setItem('originalUrlParams', originalParamString);
+      console.log("Stored original URL parameters in session storage:", originalParamString);
+    }
+    
+    // Store firstName in sessionStorage if available
+    if (firstName) {
+      sessionStorage.setItem('donorFirstName', firstName);
+      console.log("Stored donor first name in session storage:", firstName);
+    }
+    
+    // If we have wrapped data in the URL parameters, use it directly
+    if (hasWrappedData && wrappedData) {
+      console.log("Found wrapped donor data in URL, using directly:", wrappedData);
+      
+      // Calculate impact based on last gift amount or lifetime giving
+      // If lastGiftAmount is available, use that as the donation amount
+      // If not, try to calculate an average gift from lifetime giving and total gifts
+      // If that's not possible either, fall back to a default value of 100
+      let amount = 100; // Default fallback value
+      
+      if (wrappedData.lastGiftAmount > 0) {
+        amount = wrappedData.lastGiftAmount;
+        console.log("Using lastGiftAmount for impact calculation:", amount);
+      } else if (wrappedData.lifetimeGiving > 0 && wrappedData.totalGifts > 0) {
+        amount = wrappedData.lifetimeGiving / wrappedData.totalGifts;
+        console.log("Calculated average gift amount from lifetime giving:", amount);
+      } else if (wrappedData.lifetimeGiving > 0) {
+        // If we have lifetime giving but no total gifts, use a reasonable portion of it
+        amount = wrappedData.lifetimeGiving * 0.1; // Use 10% of lifetime giving as a reasonable gift
+        amount = Math.min(amount, 1000); // Cap at $1000 to avoid extreme values
+        amount = Math.max(amount, 50);   // Ensure at least $50
+        console.log("Estimated gift amount from lifetime giving:", amount);
+      }
+      
+      // Round to 2 decimal places for currency
+      amount = Math.round(amount * 100) / 100;
+      
+      // Store the wrapped data in sessionStorage for later use
+      sessionStorage.setItem('wrappedDonorData', JSON.stringify(wrappedData));
+      
+      // Also store all URL parameters for retrieval by other components
+      sessionStorage.setItem('donorParams', JSON.stringify(allParams));
+      
+      // Calculate impact
+      this.setState({ 
+        isLoading: true,
+        step: SlideNames.LOADING,
+        donorEmail: email || null
+      });
+      
+      // Simulate loading for better user experience
+      setTimeout(() => {
+        const impact = calculateDonationImpact(amount);
+        
+        // Check if we're using donor UI (for logging purposes only)
+        const urlParams = new URLSearchParams(window.location.search);
+        const useDonorSlides = urlParams.get('donorUI') === 'true';
+        
+        // Always go to donor intro slide for wrapped data users
+        const nextStep = SlideNames.DONOR_INTRO;
+        
+        this.setState({
+          amount,
+          impact,
+          isLoading: false,
+          step: nextStep,
+        });
+        
+        toast({
+          title: "Welcome Back!",
+          description: "We've loaded your personalized donor information. Explore the impact of your generosity!",
+        });
+        
+        // Also call the server for more accurate impact calculation
+        this.calculateImpact(amount);
+      }, SLIDE_CONFIG.progressDuration);
+      
+      return;
+    }
+    
+    // If no wrapped data but we have an email, try to fetch from the server
+    if (email) {
+      console.log("Found email in URL, attempting to fetch donor info from server:", email);
+      sessionStorage.setItem('donorEmail', email); // Store email for other components
+      
+      this.fetchDonorInfo(email)
+        .then(success => {
+          if (success) {
+            toast({
+              title: "Welcome Back!",
+              description: "We've loaded your previous donation information. Explore the impact of your generosity!",
+            });
+          } else {
+            toast({
+              title: "Donor Not Found",
+              description: "We couldn't find donation information for the provided email. Please enter a donation amount to see its impact.",
+            });
+          }
+        });
+    }
+    
+    // Check for errors
+    if (this.state.error) {
+      toast({
+        title: "Error",
+        description: this.state.error,
+        variant: "destructive",
+      });
+    }
   }
   
   /**
@@ -711,56 +772,56 @@ export default class DonationImpactPage extends Component<RouteComponentProps, D
     });
   }
 
-/**
- * Reset to beginning
- */
-resetDonation() {
-  // Check if we're in donor UI mode
-  const urlParams = new URLSearchParams(window.location.search);
-  const useDonorSlides = urlParams.get('donorUI') === 'true';
-  
-  this.setState({
-    amount: 0,
-    previousStep: this.state.step,
-    step: SlideNames.WELCOME,
-    impact: null,
-    isLoading: false,
-    error: null,
-    donorEmail: null,
-    transitionDirection: 'backward'
-  });
-  
-  if (useDonorSlides) {
-    // Stay on impact page but keep donorUI parameter
-    window.history.pushState({}, '', '/impact?donorUI=true');
-  } else {
-    // Return to the landing page
-    window.history.pushState({}, '', '/');
+  /**
+   * Reset to beginning
+   */
+  resetDonation() {
+    // Check if we're in donor UI mode
+    const urlParams = new URLSearchParams(window.location.search);
+    const useDonorSlides = urlParams.get('donorUI') === 'true';
+    
+    this.setState({
+      amount: 0,
+      previousStep: this.state.step,
+      step: SlideNames.WELCOME,
+      impact: null,
+      isLoading: false,
+      error: null,
+      donorEmail: null,
+      transitionDirection: 'backward'
+    });
+    
+    if (useDonorSlides) {
+      // Stay on impact page but keep donorUI parameter
+      window.history.pushState({}, '', '/impact?donorUI=true');
+    } else {
+      // Return to the landing page
+      window.history.pushState({}, '', '/');
+    }
   }
-}
 
-/**
- * Check if current slide is the first content slide
- */
-isFirstSlide() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const useDonorSlides = urlParams.get('donorUI') === 'true';
-  
-  if (useDonorSlides) {
-    // For donor UI, the intro slide is the first content slide
-    return this.state.step === SlideNames.DONOR_INTRO;
-  } else {
-    // For standard UI, donor summary or meals are first content slides
-    return this.state.step <= SlideNames.DONOR_SUMMARY || this.state.step === SlideNames.MEALS;
+  /**
+   * Check if current slide is the first content slide
+   */
+  isFirstSlide() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const useDonorSlides = urlParams.get('donorUI') === 'true';
+    
+    if (useDonorSlides) {
+      // For donor UI, the intro slide is the first content slide
+      return this.state.step === SlideNames.DONOR_INTRO;
+    } else {
+      // For standard UI, donor summary or meals are first content slides
+      return this.state.step <= SlideNames.DONOR_SUMMARY || this.state.step === SlideNames.MEALS;
+    }
   }
-}
 
-/**
- * Check if current slide is the last slide
- */
-isLastSlide() {
-  return this.state.step >= SlideNames.SUMMARY;
-}
+  /**
+   * Check if current slide is the last slide
+   */
+  isLastSlide() {
+    return this.state.step >= SlideNames.SUMMARY;
+  }
   
   /**
    * Handle sharing functionality
