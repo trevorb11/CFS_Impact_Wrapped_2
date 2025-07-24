@@ -22,6 +22,7 @@ import DonorMealsSlide from "@/components/donation/DonorMealsSlide";
 import DonorPeopleSlide from "@/components/donation/DonorPeopleSlide";
 import DonorFinancialSlide from "@/components/donation/DonorFinancialSlide";
 import DonorIntroSlide from "@/components/donation/DonorIntroSlide";
+import IntroSlides from "@/components/donation/IntroSlides";
 
 import { toast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -202,7 +203,8 @@ export default class DonationImpactPage extends Component<RouteComponentProps, D
       isLoading: false,
       error: null,
       donorEmail: null,
-      transitionDirection: 'forward'
+      transitionDirection: 'forward',
+      showIntroSlides: false
     };
     
     // Bind methods
@@ -215,6 +217,7 @@ export default class DonationImpactPage extends Component<RouteComponentProps, D
     this.fetchDonorInfo = this.fetchDonorInfo.bind(this);
     this.handleShare = this.handleShare.bind(this);
     this.handleURLParams = this.handleURLParams.bind(this);
+    this.onIntroSlidesComplete = this.onIntroSlidesComplete.bind(this);
   }
   
   /**
@@ -358,7 +361,7 @@ export default class DonationImpactPage extends Component<RouteComponentProps, D
       // Also store all URL parameters for retrieval by other components
       sessionStorage.setItem('donorParams', JSON.stringify(allParams));
       
-      // Calculate impact
+      // Calculate impact and show intro slides for personalized donors
       this.setState({ 
         isLoading: true,
         step: SlideNames.LOADING,
@@ -369,23 +372,13 @@ export default class DonationImpactPage extends Component<RouteComponentProps, D
       setTimeout(() => {
         const impact = calculateDonationImpact(amount);
         
-        // Check if we're using donor UI (for logging purposes only)
-        const urlParams = new URLSearchParams(window.location.search);
-        const useDonorSlides = urlParams.get('donorUI') === 'true';
-        
-        // Always go to donor intro slide for wrapped data users
-        const nextStep = SlideNames.DONOR_INTRO;
-        
+        // Show intro slides for personalized donors with firstName
         this.setState({
           amount,
           impact,
           isLoading: false,
-          step: nextStep,
-        });
-        
-        toast({
-          title: "Welcome Back!",
-          description: "We've loaded your personalized donor information. Explore the impact of your generosity!",
+          step: SlideNames.LOADING, // Keep loading while intro slides play
+          showIntroSlides: !!firstName // Show intro slides if we have a first name
         });
         
         // Also call the server for more accurate impact calculation
@@ -964,6 +957,21 @@ export default class DonationImpactPage extends Component<RouteComponentProps, D
     });
   }
   
+  /**
+   * Handle completion of intro slides
+   */
+  onIntroSlidesComplete() {
+    this.setState({
+      showIntroSlides: false,
+      step: SlideNames.DONOR_INTRO
+    });
+    
+    toast({
+      title: "Welcome Back!",
+      description: "We've loaded your personalized donor information. Explore the impact of your generosity!",
+    });
+  }
+  
   render() {
     const { state } = this;
 
@@ -1079,6 +1087,16 @@ export default class DonationImpactPage extends Component<RouteComponentProps, D
           return <div>Invalid step</div>;
       }
     };
+
+    // Show intro slides if enabled
+    if (state.showIntroSlides) {
+      return (
+        <IntroSlides 
+          donorFirstName={sessionStorage.getItem('donorFirstName') || undefined}
+          onComplete={this.onIntroSlidesComplete}
+        />
+      );
+    }
 
     return (
       <div className="min-h-screen relative font-sans overflow-hidden">

@@ -12,6 +12,7 @@ export interface DonationState {
   error: string | null;
   donorEmail: string | null;
   transitionDirection?: 'forward' | 'backward';
+  showIntroSlides?: boolean;
 }
 
 export interface DonationImpact {
