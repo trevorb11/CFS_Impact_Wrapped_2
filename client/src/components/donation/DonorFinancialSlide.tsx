@@ -47,7 +47,7 @@ export default function DonorFinancialSlide({
     <SlideLayout
       title="Financial Impact"
       variant="donor"
-      quote="Your donation goes further than you might think, creating ripple effects throughout our community."
+      quote="Your dollar works harder than you think."
       onNext={onNext}
       onPrevious={onPrevious}
       isFirstSlide={isFirstSlide}
@@ -69,18 +69,18 @@ export default function DonorFinancialSlide({
           transition={{ delay: 0.3, duration: 0.5 }}
           className="text-center"
         >
-          <h3 className="text-lg sm:text-xl text-[#414042] font-medium mb-2">
-            Your ${amount} donation creates
-          </h3>
-          <div className="text-3xl sm:text-4xl font-bold text-[#8dc53e]">
+          <div className="text-5xl sm:text-6xl md:text-7xl font-bold text-[#8dc53e] mb-4">
             <CountUpAnimation
               value={communityValue} 
               isCurrency={true}
               className="text-[#8dc53e]"
-            /> in community value
+            />
           </div>
-          <p className="text-[#414042] mt-2 text-sm sm:text-base">
-            That's a {leverageFactor}x return on your investment!
+          <p className="text-2xl sm:text-3xl font-semibold text-[#414042] mb-2">
+            Community Value Created
+          </p>
+          <p className="text-lg text-[#414042]">
+            ${amount} × {leverageFactor} = {leverageFactor}x impact
           </p>
         </motion.div>
       </div>
@@ -100,9 +100,9 @@ export default function DonorFinancialSlide({
               <TrendingUp className="h-5 w-5 text-[#8dc53e]" />
             </div>
             <div>
-              <h4 className="font-medium text-[#414042]">Economic Value</h4>
+              <h4 className="font-medium text-[#414042]">How Your Dollar Works</h4>
               <p className="text-sm text-gray-600">
-                Every dollar you donate helps us secure and distribute ${leverageFactor} worth of groceries through our partnerships
+                $1 donated = ${leverageFactor} worth of groceries through partnerships
               </p>
             </div>
           </div>
@@ -115,8 +115,8 @@ export default function DonorFinancialSlide({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.2, duration: 0.5 }}
       >
-        <p className="text-[#414042] text-sm">
-          Every dollar you donate helps us provide <span className="font-medium">${leverageFactor}</span> worth of nutritious groceries to families in need.
+        <p className="text-[#414042] font-medium">
+          $1 donated = ${leverageFactor} worth of nutritious groceries
         </p>
       </motion.div>
     </SlideLayout>

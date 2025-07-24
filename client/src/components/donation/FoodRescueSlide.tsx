@@ -236,21 +236,22 @@ export default function FoodRescueSlide({
       title="Food Rescue Impact"
       titleClassName="text-white" // Make title white
       variant="foodRescue"
-      quote="When food goes to waste in landfills, it produces methane - a greenhouse gas 25 times more potent than carbon dioxide. Every pound of food we rescue makes a difference."
+      quote="Rescuing food, protecting our planet."
       onNext={onNext}
       onPrevious={onPrevious}
       isFirstSlide={isFirstSlide}
       isLastSlide={isLastSlide}
     >
-      <div className="mb-4 sm:mb-6 md:mb-8">
-        <div className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-extrabold mb-2 sm:mb-4">
-          <motion.span>{roundedFood}</motion.span> lbs
+      <div className="mb-6 sm:mb-8 text-center">
+        <div className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-heading font-extrabold mb-4">
+          <motion.span>{roundedFood}</motion.span>
         </div>
-        <p className="text-base sm:text-lg md:text-xl">of food rescued from being wasted</p>
+        <p className="text-2xl sm:text-3xl font-semibold mb-2">Pounds of Food Rescued</p>
+        <p className="text-lg">Prevented from going to waste</p>
       </div>
       
       <div className="mb-4 sm:mb-6 md:mb-8">
-        <p className="text-lg sm:text-xl md:text-2xl mb-2 sm:mb-4">That's equivalent to the weight of:</p>
+        <p className="text-xl sm:text-2xl mb-4">Equivalent to the weight of:</p>
         
         <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4">
           {/* Large donation comparisons */}

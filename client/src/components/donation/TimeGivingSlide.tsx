@@ -292,53 +292,36 @@ export default function TimeGivingSlide({
     return { icon: Sparkles, color: "text-purple-500", emoji: "✨" };
   };
 
-  // Generate a personalized message based on years of giving and first name if available
-  const getGivingJourneyMessage = (): { title: string; message: string; funFact: string } => {
+  // Generate a simplified message based on years of giving
+  const getGivingJourneyMessage = (): { title: string; message: string } => {
     const years = getYearsGiving();
     const milestone = getMilestoneIcon();
     const namePrefix = donorFirstName ? `${donorFirstName}, ` : "";
     
     if (years <= 0) {
       return {
-        title: `${milestone.emoji} ${namePrefix}Welcome to the Community Food Share Family!`,
-        message: "You're just beginning your hunger-fighting journey with us. Your support will help ensure nutritious food reaches those who need it most.",
-        funFact: "Did you know? First-time donors like you help us expand our reach to new communities every year!"
+        title: `${milestone.emoji} ${namePrefix}Welcome to Our Family!`,
+        message: "Starting your hunger-fighting journey with us."
       };
     } else if (years === 1) {
       return {
-        title: `${milestone.emoji} ${namePrefix}One Year of Fighting Hunger`,
-        message: "You've completed your first year with us! In just 12 months, you've already made a significant difference by helping provide nutritious meals to people in need.",
-        funFact: "Fun fact: In your first year of giving, you've joined thousands of other one-year donors who collectively help us serve over 40,000 meals annually!"
+        title: `${milestone.emoji} ${namePrefix}One Year Strong`,
+        message: "Already making a significant difference in our community."
       };
-    } else if (years === 2) {
+    } else if (years >= 2 && years <= 4) {
       return {
-        title: `${milestone.emoji} ${namePrefix}Two Years of Growing Impact`,
-        message: "Two years in, and your commitment to fighting hunger is growing stronger. Your continued support means more families have reliable access to nutritious food.",
-        funFact: "Did you know? Second-year donors like you have a 70% higher impact than first-time donors because you understand where help is needed most!"
-      };
-    } else if (years === 3) {
-      return {
-        title: `${milestone.emoji} ${namePrefix}Three Years of Dedicated Support`,
-        message: "Three years of consistent support makes you a veteran hunger fighter! Your commitment is helping build a healthier community with sustainable food security.",
-        funFact: "Fun fact: Three-year donors like you make up just 15% of our donor base but contribute nearly 40% of our annual donation revenue!"
-      };
-    } else if (years === 4) {
-      return {
-        title: `${milestone.emoji} ${namePrefix}Four Years of Transformative Giving`,
-        message: "Your support over four years is like fertile soil for our community—nurturing growth and resilience through continued food access. That's something to celebrate!",
-        funFact: "Amazing! At four years of giving, you've likely helped provide enough meals to feed a family of four for over six months!"
+        title: `${milestone.emoji} ${namePrefix}${years} Years of Impact`,
+        message: "Your continued commitment is building a hunger-free community."
       };
     } else if (years >= 5 && years < 10) {
       return {
-        title: `${milestone.emoji} ${namePrefix}${years} Years as a Food Security Champion`,
-        message: `For ${years} years, you've been a cornerstone of our hunger relief efforts. Your long-term commitment means thousands of meals for families in our community.`,
-        funFact: `Incredible! Donors who have given for ${years} years are among our most valued supporters, with a deep understanding of local food insecurity challenges.`
+        title: `${milestone.emoji} ${namePrefix}${years} Years as a Champion`,
+        message: "A cornerstone of our hunger relief efforts."
       };
     } else {
       return {
-        title: `${milestone.emoji} ${namePrefix}A Decade+ of Extraordinary Impact`,
-        message: `After an incredible ${years} years of support, you're truly a pillar of our mission. Your extraordinary commitment has helped countless neighbors facing food insecurity.`,
-        funFact: `Remarkable! Less than 3% of our donors have supported us for ${years}+ years, placing you among our most loyal and dedicated hunger fighters!`
+        title: `${milestone.emoji} ${namePrefix}${years}+ Years of Excellence`,
+        message: "A pillar of our mission and community."
       };
     }
   };
@@ -431,7 +414,7 @@ export default function TimeGivingSlide({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.5 }}
               >
-                <div className="flex flex-col sm:flex-row items-center sm:items-start mb-3">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start">
                   <div className={`p-2 rounded-full ${milestone.color} bg-opacity-20 mb-3 sm:mb-0 sm:mr-4`}>
                     <MilestoneIcon className={`h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 ${milestone.color}`} />
                   </div>
@@ -443,11 +426,6 @@ export default function TimeGivingSlide({
                       {givingJourneyMessage.message}
                     </p>
                   </div>
-                </div>
-                <div className="bg-white p-3 sm:p-4 rounded-lg border border-green-100 mt-3 sm:mt-4">
-                  <p className="text-sm md:text-base text-gray-700 italic">
-                    "{givingJourneyMessage.funFact}"
-                  </p>
                 </div>
               </motion.div>
             )}
@@ -465,15 +443,15 @@ export default function TimeGivingSlide({
                     <div className="bg-blue-100 p-1.5 sm:p-2 rounded-full mb-1 sm:mb-2">
                       <Clock className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 text-blue-600" />
                     </div>
-                    <p className="text-lg sm:text-xl md:text-2xl font-bold text-blue-700">
+                    <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-blue-700 mb-2">
                       <CountUpAnimation 
                         value={journeyStats.years > 0 ? journeyStats.years : years}
                         className="font-bold"
                         delay={0.2}
                       />
-                      <span> {(journeyStats.years || years) === 1 ? "Year" : "Years"}</span>
                     </p>
-                    <p className="text-xs sm:text-sm font-medium text-blue-600">Years of Support</p>
+                    <p className="text-sm font-medium text-blue-600">{(journeyStats.years || years) === 1 ? "Year" : "Years"}</p>
+                    <p className="text-xs sm:text-sm font-medium text-blue-600">of Support</p>
                   </CardContent>
                 </Card>
                 
@@ -483,14 +461,14 @@ export default function TimeGivingSlide({
                     <div className="bg-green-100 p-1.5 sm:p-2 rounded-full mb-1 sm:mb-2">
                       <Award className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 text-green-600" />
                     </div>
-                    <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-700 flex items-center justify-center">
+                    <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-green-700 mb-2">
                       $<CountUpAnimation 
                         value={journeyStats.totalGiving || donorSummary?.lifetimeGiving || 0}
                         className="font-bold"
                         delay={0.3}
                       />
                     </p>
-                    <p className="text-xs sm:text-sm font-medium text-green-600">Lifetime Impact</p>
+                    <p className="text-xs sm:text-sm font-medium text-green-600">Lifetime Giving</p>
                   </CardContent>
                 </Card>
                 
@@ -500,14 +478,14 @@ export default function TimeGivingSlide({
                     <div className="bg-amber-100 p-1.5 sm:p-2 rounded-full mb-1 sm:mb-2">
                       <Gift className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 text-amber-600" />
                     </div>
-                    <p className="text-lg sm:text-xl md:text-2xl font-bold text-amber-700 flex items-center justify-center">
+                    <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-amber-700 mb-2">
                       $<CountUpAnimation 
                         value={donorSummary?.lastGift?.amount || amount}
                         className="font-bold"
                         delay={0.4}
                       />
                     </p>
-                    <p className="text-xs sm:text-sm font-medium text-amber-600">Most Recent Gift</p>
+                    <p className="text-xs sm:text-sm font-medium text-amber-600">Recent Gift</p>
                   </CardContent>
                 </Card>
                 

@@ -79,7 +79,7 @@ export default function PeopleSlide({
     <SlideLayout
       title="You Helped Serve"
       variant="people"
-      quote="Every number represents a real person with a name, a story, and hope for tomorrow."
+      quote="Real people, real stories, real hope."
       onNext={onNext}
       onPrevious={onPrevious}
       isFirstSlide={isFirstSlide}
@@ -100,10 +100,10 @@ export default function PeopleSlide({
         </motion.div>
         
         <div className="text-center">
-          <p className="text-lg font-semibold text-[#414042]">Your donation serves</p>
-          <p className="text-4xl font-bold text-[#0c4428]">
-            <motion.span>{rounded}</motion.span> People
+          <p className="text-6xl sm:text-7xl md:text-8xl font-bold text-[#0c4428] mb-4">
+            <motion.span>{rounded}</motion.span>
           </p>
+          <p className="text-2xl sm:text-3xl font-semibold text-[#414042]">People Served</p>
         </div>
         
         {/* People visualization */}
@@ -134,7 +134,7 @@ export default function PeopleSlide({
           transition={{ delay: 2.5, duration: 0.5 }}
         >
           <p className="text-[#414042] text-sm">
-            Each dot represents people in Boulder & Broomfield Counties you've helped.
+            Each dot represents people you've helped in Boulder & Broomfield
           </p>
         </motion.div>
         
@@ -176,14 +176,13 @@ export default function PeopleSlide({
         </motion.div>
         
         <motion.div 
-          className="bg-[#f0f9f4] p-4 sm:p-5 rounded-lg border border-[#0c4428]/10 w-full mt-2"
+          className="bg-[#f0f9f4] p-4 rounded-lg border border-[#0c4428]/10 w-full mt-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.5, duration: 0.5 }}
         >
-          <p className="text-center text-[#0c4428]">
-            Your donation directly impacts our ability to serve families in need in our community.
-            <span className="block mt-1 font-medium">Together, we're building a hunger-free community.</span>
+          <p className="text-center text-[#0c4428] font-medium">
+            Building a hunger-free community, one person at a time
           </p>
         </motion.div>
       </div>

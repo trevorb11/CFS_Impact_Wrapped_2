@@ -130,7 +130,7 @@ export default function EnvironmentSlide({
     <SlideLayout
       title="Your Environmental Impact"
       variant="environment"
-      quote="When we rescue food, we're not just fighting hunger — we're fighting climate change."
+      quote="Fighting hunger and climate change together."
       onNext={onNext}
       onPrevious={onPrevious}
       isFirstSlide={isFirstSlide}
@@ -184,13 +184,9 @@ export default function EnvironmentSlide({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.5 }}
         >
-          <p className="text-lg font-semibold text-[#414042]">Your donation helps the environment</p>
-          <p className="text-4xl font-bold text-[#0c4428]">
-            Environmental Impact
-          </p>
-          <p className="text-sm text-[#414042] mt-2">
-            By rescuing <span className="font-medium">{impact.foodRescued.toLocaleString()}</span> pounds of food, 
-            you're helping the planet in multiple ways
+          <p className="text-2xl sm:text-3xl font-semibold text-[#414042] mb-2">Environmental Impact</p>
+          <p className="text-lg text-[#414042]">
+            By rescuing {impact.foodRescued.toLocaleString()} pounds of food
           </p>
         </motion.div>
         
@@ -254,10 +250,11 @@ export default function EnvironmentSlide({
                     <CountUpAnimation 
                       value={impact.co2Saved} 
                       duration={2} 
-                      className="text-4xl font-bold text-[#8dc53e]"
+                      className="text-5xl sm:text-6xl md:text-7xl font-bold text-[#8dc53e]"
                     />
-                    <span className="text-2xl font-semibold text-[#8dc53e] ml-2">lbs</span>
+                    <span className="text-3xl sm:text-4xl font-semibold text-[#8dc53e] ml-2">lbs</span>
                   </div>
+                  <p className="text-center text-lg font-semibold text-[#414042] mt-2">CO₂ Prevented</p>
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
@@ -306,10 +303,11 @@ export default function EnvironmentSlide({
                     <CountUpAnimation 
                       value={impact.waterSaved} 
                       duration={2} 
-                      className="text-4xl font-bold text-[#227d7f]"
+                      className="text-5xl sm:text-6xl md:text-7xl font-bold text-[#227d7f]"
                     />
-                    <span className="text-2xl font-semibold text-[#227d7f] ml-2">gallons</span>
+                    <span className="text-3xl sm:text-4xl font-semibold text-[#227d7f] ml-2">gallons</span>
                   </div>
+                  <p className="text-center text-lg font-semibold text-[#414042] mt-2">Water Saved</p>
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
@@ -343,14 +341,13 @@ export default function EnvironmentSlide({
         
         {/* Call to action */}
         <motion.div 
-          className="bg-[#f0f9f4] p-4 sm:p-5 rounded-lg border border-[#0c4428]/10 w-full"
+          className="bg-[#f0f9f4] p-4 rounded-lg border border-[#0c4428]/10 w-full"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.5, duration: 0.5 }}
         >
-          <p className="text-center text-[#0c4428]">
-            Your donation helps us rescue food that would otherwise end up in landfills.
-            <span className="block mt-1 font-medium">Fighting hunger and climate change together.</span>
+          <p className="text-center text-[#0c4428] font-medium">
+            Fighting hunger and climate change together
           </p>
         </motion.div>
       </div>
