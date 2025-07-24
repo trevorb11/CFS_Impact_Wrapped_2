@@ -439,29 +439,30 @@ export default function TimeGivingSlide({
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
                 {/* Years of Support */}
                 <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 shadow-md hover:shadow-lg transition-all">
-                  <CardContent className="p-3 sm:p-4 flex flex-col items-center text-center">
-                    <div className="bg-blue-100 p-1.5 sm:p-2 rounded-full mb-1 sm:mb-2">
-                      <Clock className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 text-blue-600" />
+                  <CardContent className="p-3 sm:p-4 flex flex-col items-center text-center min-h-[120px] justify-center">
+                    <div className="bg-blue-100 p-1.5 sm:p-2 rounded-full mb-2">
+                      <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                     </div>
-                    <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-blue-700 mb-2">
+                    <p className="text-2xl sm:text-3xl font-bold text-blue-700 mb-1">
                       <CountUpAnimation 
                         value={journeyStats.years > 0 ? journeyStats.years : years}
                         className="font-bold"
                         delay={0.2}
                       />
                     </p>
-                    <p className="text-sm font-medium text-blue-600">{(journeyStats.years || years) === 1 ? "Year" : "Years"}</p>
-                    <p className="text-xs sm:text-sm font-medium text-blue-600">of Support</p>
+                    <p className="text-xs sm:text-sm font-medium text-blue-600">
+                      {(journeyStats.years || years) === 1 ? "Year" : "Years"} of Support
+                    </p>
                   </CardContent>
                 </Card>
                 
                 {/* Lifetime Impact */}
                 <Card className="bg-gradient-to-br from-green-50 to-teal-50 shadow-md hover:shadow-lg transition-all">
-                  <CardContent className="p-3 sm:p-4 flex flex-col items-center text-center">
-                    <div className="bg-green-100 p-1.5 sm:p-2 rounded-full mb-1 sm:mb-2">
-                      <Award className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 text-green-600" />
+                  <CardContent className="p-3 sm:p-4 flex flex-col items-center text-center min-h-[120px] justify-center">
+                    <div className="bg-green-100 p-1.5 sm:p-2 rounded-full mb-2">
+                      <Award className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
                     </div>
-                    <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-green-700 mb-2">
+                    <p className="text-xl sm:text-2xl font-bold text-green-700 mb-1">
                       $<CountUpAnimation 
                         value={journeyStats.totalGiving || donorSummary?.lifetimeGiving || 0}
                         className="font-bold"
@@ -474,11 +475,11 @@ export default function TimeGivingSlide({
                 
                 {/* Most Recent Gift */}
                 <Card className="bg-gradient-to-br from-amber-50 to-yellow-50 shadow-md hover:shadow-lg transition-all">
-                  <CardContent className="p-3 sm:p-4 flex flex-col items-center text-center">
-                    <div className="bg-amber-100 p-1.5 sm:p-2 rounded-full mb-1 sm:mb-2">
-                      <Gift className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 text-amber-600" />
+                  <CardContent className="p-3 sm:p-4 flex flex-col items-center text-center min-h-[120px] justify-center">
+                    <div className="bg-amber-100 p-1.5 sm:p-2 rounded-full mb-2">
+                      <Gift className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
                     </div>
-                    <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-amber-700 mb-2">
+                    <p className="text-xl sm:text-2xl font-bold text-amber-700 mb-1">
                       $<CountUpAnimation 
                         value={donorSummary?.lastGift?.amount || amount}
                         className="font-bold"
@@ -491,21 +492,21 @@ export default function TimeGivingSlide({
                 
                 {/* Hunger Fighting Hero */}
                 <Card className="bg-gradient-to-br from-rose-50 to-pink-50 shadow-md hover:shadow-lg transition-all">
-                  <CardContent className="p-3 sm:p-4 flex flex-col items-center text-center relative">
-                    <div className="bg-rose-100 p-1.5 sm:p-2 rounded-full mb-1 sm:mb-2">
-                      <Trophy className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 text-rose-600" />
+                  <CardContent className="p-3 sm:p-4 flex flex-col items-center text-center min-h-[120px] justify-center relative">
+                    <div className="bg-rose-100 p-1.5 sm:p-2 rounded-full mb-2">
+                      <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-rose-600" />
                     </div>
                     <motion.div
                       className="absolute -top-1 -right-1"
                       animate={{ rotate: [0, 10, 0, -10, 0] }}
                       transition={{ duration: 5, repeat: Infinity }}
                     >
-                      <div className="text-sm sm:text-base md:text-lg">✨</div>
+                      <div className="text-sm">✨</div>
                     </motion.div>
-                    <p className="text-base sm:text-lg md:text-xl font-bold text-rose-700">
+                    <p className="text-sm sm:text-base font-bold text-rose-700 mb-1">
                       {years >= 5 ? "Champion" : years >= 3 ? "Advocate" : years >= 1 ? "Supporter" : "Newcomer"}
                     </p>
-                    <p className="text-xs sm:text-sm font-medium text-rose-600">Hunger Fighting Hero</p>
+                    <p className="text-xs font-medium text-rose-600">Hunger Fighting Hero</p>
                   </CardContent>
                 </Card>
               </div>
