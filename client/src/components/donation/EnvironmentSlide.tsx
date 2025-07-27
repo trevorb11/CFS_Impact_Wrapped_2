@@ -245,17 +245,79 @@ export default function EnvironmentSlide({
                   </div>
                 </div>
                 
-                <div className="bg-white/70 rounded-lg p-4 w-full mb-4">
-                  <div className="flex items-end justify-center">
-                    <CountUpAnimation 
-                      value={impact.co2Saved} 
-                      duration={2} 
-                      className="text-5xl sm:text-6xl md:text-7xl font-bold text-[#8dc53e]"
-                    />
-                    <span className="text-3xl sm:text-4xl font-semibold text-[#8dc53e] ml-2">lbs</span>
+                <motion.div 
+                  className="bg-gradient-to-br from-white/90 to-white/70 rounded-lg p-4 w-full mb-4 relative overflow-hidden"
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.3, duration: 0.6, type: "spring" }}
+                >
+                  {/* Floating background elements */}
+                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    {[...Array(8)].map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="absolute rounded-full bg-[#8dc53e] opacity-10"
+                        style={{
+                          width: Math.random() * 40 + 15,
+                          height: Math.random() * 40 + 15,
+                          left: `${Math.random() * 100}%`,
+                          top: `${Math.random() * 100}%`,
+                        }}
+                        animate={{
+                          y: [-15, 15, -15],
+                          x: [-8, 8, -8],
+                          rotate: [0, 180, 360],
+                          scale: [0.8, 1.2, 0.8],
+                        }}
+                        transition={{
+                          duration: 6 + Math.random() * 2,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                          delay: Math.random() * 2,
+                        }}
+                      />
+                    ))}
                   </div>
-                  <p className="text-center text-lg font-semibold text-[#414042] mt-2">CO₂ Prevented</p>
-                </div>
+
+                  <div className="flex items-end justify-center relative z-10">
+                    <motion.div
+                      animate={{ 
+                        textShadow: [
+                          "0 0 0 transparent",
+                          "0 0 25px rgba(141, 197, 62, 0.4)",
+                          "0 0 0 transparent"
+                        ]
+                      }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay: 0.5
+                      }}
+                    >
+                      <CountUpAnimation 
+                        value={impact.co2Saved} 
+                        duration={2} 
+                        className="text-5xl sm:text-6xl md:text-7xl font-bold text-[#8dc53e]"
+                      />
+                    </motion.div>
+                    <motion.span 
+                      className="text-3xl sm:text-4xl font-semibold text-[#8dc53e] ml-2"
+                      animate={{ 
+                        scale: [1, 1.1, 1],
+                        opacity: [1, 0.8, 1]
+                      }}
+                      transition={{
+                        duration: 4,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    >
+                      lbs
+                    </motion.span>
+                  </div>
+                  <p className="text-center text-lg font-semibold text-[#414042] mt-2 relative z-10">CO₂ Prevented</p>
+                </motion.div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
                   <div className="bg-white/50 p-3 rounded-lg text-center shadow-sm">

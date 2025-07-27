@@ -24,7 +24,7 @@ export default function IntroSlides({ donorFirstName, onComplete }: IntroSlidesP
           onComplete();
         }, 500);
       }
-    }, 3000); // 3 seconds per slide
+    }, 4500); // 4.5 seconds per slide
 
     return () => clearTimeout(timer);
   }, [currentSlide, isComplete, onComplete]);

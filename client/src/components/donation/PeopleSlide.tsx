@@ -85,7 +85,36 @@ export default function PeopleSlide({
       isFirstSlide={isFirstSlide}
       isLastSlide={isLastSlide}
     >
-      <div className="flex flex-col items-center space-y-5">
+      <div className="flex flex-col items-center space-y-5 relative">
+        {/* Floating hearts and sparkles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(15)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute text-2xl"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [-30, 30, -30],
+                x: [-15, 15, -15],
+                rotate: [0, 360],
+                scale: [0.8, 1.2, 0.8],
+                opacity: [0.3, 0.8, 0.3],
+              }}
+              transition={{
+                duration: 5 + Math.random() * 3,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: Math.random() * 3,
+              }}
+            >
+              {i % 3 === 0 ? "💚" : i % 3 === 1 ? "✨" : "🤗"}
+            </motion.div>
+          ))}
+        </div>
+
         <motion.div
           initial={{ scale: 0, rotate: -180 }}
           animate={{ scale: 1, rotate: 0 }}
@@ -96,18 +125,65 @@ export default function PeopleSlide({
             delay: 0.3 
           }}
         >
-          <Users className="h-16 w-16 text-[#0c4428] mb-3" />
+          <motion.div
+            animate={{ 
+              rotate: [0, -10, 10, 0],
+              scale: [1, 1.15, 1]
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            <Users className="h-16 w-16 text-[#0c4428] mb-3" />
+          </motion.div>
         </motion.div>
         
-        <div className="text-center">
-          <p className="text-6xl sm:text-7xl md:text-8xl font-bold text-[#0c4428] mb-4">
-            <motion.span>{rounded}</motion.span>
-          </p>
-          <p className="text-2xl sm:text-3xl font-semibold text-[#414042]">People Served</p>
+        <div className="text-center relative z-10">
+          <motion.div
+            initial={{ scale: 0.3, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.5, duration: 1, type: "spring", stiffness: 200 }}
+          >
+            <p className="text-6xl sm:text-7xl md:text-8xl font-bold text-[#0c4428] mb-4">
+              <motion.span
+                animate={{ 
+                  color: ["#0c4428", "#227d7f", "#0c4428"],
+                  textShadow: [
+                    "0 0 0 transparent",
+                    "0 0 30px rgba(34, 125, 127, 0.4)",
+                    "0 0 0 transparent"
+                  ]
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 1
+                }}
+              >
+                {rounded}
+              </motion.span>
+            </p>
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9, duration: 0.7 }}
+          >
+            <p className="text-2xl sm:text-3xl font-semibold text-[#414042]">People Served</p>
+          </motion.div>
         </div>
         
         {/* People visualization */}
-        <div className="w-full h-16 bg-[#f0f9f4] rounded-lg mb-4 relative overflow-hidden">
+        <motion.div 
+          className="w-full h-16 bg-gradient-to-r from-[#f0f9f4] via-[#e8f5e8] to-[#f0f9f4] rounded-lg mb-4 relative overflow-hidden border border-[#0c4428]/10"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1.2, duration: 0.6 }}
+        >
           <div 
             ref={peopleRef} 
             className="h-16 rounded-lg flex items-center justify-start overflow-hidden"
@@ -118,14 +194,37 @@ export default function PeopleSlide({
                 <motion.div
                   key={i}
                   className="h-2.5 w-2.5 rounded-full mx-1 my-1 bg-[#0c4428]"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.01 * i + 1 }}
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ 
+                    delay: 0.01 * i + 1.5,
+                    type: "spring",
+                    stiffness: 400
+                  }}
+                  whileHover={{ scale: 1.5 }}
                 />
               ))}
             </div>
           </div>
-        </div>
+          
+          {/* Sparkle effect overlay */}
+          <motion.div
+            className="absolute inset-0 pointer-events-none"
+            animate={{
+              background: [
+                "linear-gradient(45deg, transparent 0%, rgba(34, 125, 127, 0.1) 50%, transparent 100%)",
+                "linear-gradient(45deg, transparent 50%, rgba(34, 125, 127, 0.2) 100%, transparent 150%)",
+                "linear-gradient(45deg, transparent 100%, rgba(34, 125, 127, 0.1) 150%, transparent 200%)"
+              ]
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "linear",
+              delay: 2
+            }}
+          />
+        </motion.div>
         
         <motion.div
           className="text-center mb-1"

@@ -242,12 +242,72 @@ export default function FoodRescueSlide({
       isFirstSlide={isFirstSlide}
       isLastSlide={isLastSlide}
     >
-      <div className="mb-6 sm:mb-8 text-center">
-        <div className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-heading font-extrabold mb-4">
-          <motion.span>{roundedFood}</motion.span>
+      <div className="mb-6 sm:mb-8 text-center relative">
+        {/* Floating food and sparkle effects */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(10)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute text-xl sm:text-2xl"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [-20, 20, -20],
+                x: [-10, 10, -10],
+                rotate: [0, 360],
+                scale: [0.8, 1.3, 0.8],
+                opacity: [0.4, 0.8, 0.4],
+              }}
+              transition={{
+                duration: 4 + Math.random() * 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: Math.random() * 2,
+              }}
+            >
+              {i % 5 === 0 ? "🥬" : i % 5 === 1 ? "🍎" : i % 5 === 2 ? "✨" : i % 5 === 3 ? "🌱" : "💚"}
+            </motion.div>
+          ))}
         </div>
-        <p className="text-2xl sm:text-3xl font-semibold mb-2">Pounds of Food Rescued</p>
-        <p className="text-lg">Prevented from going to waste</p>
+
+        <motion.div
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.8, type: "spring" }}
+          className="relative z-10"
+        >
+          <div className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-heading font-extrabold mb-4">
+            <motion.span
+              animate={{ 
+                textShadow: [
+                  "0 0 0 transparent",
+                  "0 0 30px rgba(255, 255, 255, 0.6)",
+                  "0 0 0 transparent"
+                ]
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1
+              }}
+            >
+              {roundedFood}
+            </motion.span>
+          </div>
+        </motion.div>
+        
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
+          className="relative z-10"
+        >
+          <p className="text-2xl sm:text-3xl font-semibold mb-2">Pounds of Food Rescued</p>
+          <p className="text-lg">Prevented from going to waste</p>
+        </motion.div>
       </div>
       
       <div className="mb-4 sm:mb-6 md:mb-8">
