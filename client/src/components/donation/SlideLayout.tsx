@@ -40,27 +40,30 @@ export default function SlideLayout({
 }: SlideLayoutProps) {
   const bgColor = SLIDE_COLORS[variant];
   const headerBgColor = variant === 'meals' ? 'bg-[#227d7f]' : 
-                        variant === 'donor' || variant === 'donorSummary' ? 'bg-[#BAD9A3]' : 
+                        variant === 'donor' || variant === 'donorSummary' ? 'bg-[#0c4428]' : 
                         variant === 'people' || variant === 'summary' ? 'bg-[#0c4428]' : 
-                        variant === 'environment' ? 'bg-[#227d7f]' : 
-                        variant === 'foodRescue' ? 'bg-[#F08445]' : 'bg-[#0c4428]';
+                        variant === 'environment' ? 'bg-[#8dc53e]' : 
+                        variant === 'foodRescue' ? 'bg-[#efeb03]' : 
+                        variant === 'nutrition' ? 'bg-[#227d7f]' : 'bg-[#0c4428]';
 
-  // Get gradient backgrounds similar to intro slides based on variant
+  // Get gradient backgrounds using CFS brand colors
   const getFullPageBg = () => {
     switch (variant) {
       case 'meals':
-        return 'bg-gradient-to-br from-teal-600 via-cyan-600 to-blue-700';
+        return 'bg-gradient-to-br from-[#227d7f] via-[#00d6dd] to-[#0c4428]'; // Teal to Light Blue to Dark Green
       case 'people':
-        return 'bg-gradient-to-br from-green-600 via-emerald-600 to-teal-700';
+        return 'bg-gradient-to-br from-[#0c4428] via-[#8dc53e] to-[#227d7f]'; // Dark Green to Bright Green to Teal
       case 'environment':
-        return 'bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700';
+        return 'bg-gradient-to-br from-[#8dc53e] via-[#227d7f] to-[#00d6dd]'; // Bright Green to Teal to Light Blue
       case 'donor':
       case 'donorSummary':
-        return 'bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600';
+        return 'bg-gradient-to-br from-[#0c4428] via-[#227d7f] to-[#8dc53e]'; // Dark Green to Teal to Bright Green
       case 'foodRescue':
-        return 'bg-gradient-to-br from-orange-500 via-red-500 to-pink-600';
+        return 'bg-gradient-to-br from-[#efeb03] via-[#8dc53e] to-[#227d7f]'; // Yellow to Bright Green to Teal
+      case 'nutrition':
+        return 'bg-gradient-to-br from-[#227d7f] via-[#0c4428] to-[#8dc53e]'; // Teal to Dark Green to Bright Green
       default:
-        return 'bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700';
+        return 'bg-gradient-to-br from-[#0c4428] via-[#227d7f] to-[#00d6dd]'; // Dark Green to Teal to Light Blue
     }
   };
 
@@ -211,7 +214,7 @@ export default function SlideLayout({
 
   // Fallback to original card layout
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-[#BAD9A3]/10 to-[#BAD9A3]/30 p-4 md:p-6 lg:p-8">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-[#8dc53e]/10 to-[#0c4428]/20 p-4 md:p-6 lg:p-8">
       <div className="w-full max-w-md md:max-w-lg lg:max-w-xl">
         <Card className="w-full overflow-hidden">
           <CardHeader className={`text-center ${headerBgColor} text-white rounded-t-lg py-4 md:py-6`}>

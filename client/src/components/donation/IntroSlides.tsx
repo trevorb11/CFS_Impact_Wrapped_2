@@ -32,19 +32,19 @@ export default function IntroSlides({ donorFirstName, onComplete }: IntroSlidesP
   const slides = [
     {
       text: `${donorFirstName ? `${donorFirstName}, w` : "W"}elcome to your Fiscal Year 2025 Impact Wrapped`,
-      bgColor: "bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700",
+      bgColor: "bg-gradient-to-br from-[#0c4428] via-[#227d7f] to-[#00d6dd]", // Dark Green to Teal to Light Blue
       textColor: "text-white",
       delay: 0.3
     },
     {
       text: "See The Direct Impact You Made In Our Community",
-      bgColor: "bg-gradient-to-br from-green-600 via-teal-600 to-emerald-700", 
+      bgColor: "bg-gradient-to-br from-[#227d7f] via-[#8dc53e] to-[#0c4428]", // Teal to Bright Green to Dark Green
       textColor: "text-white",
       delay: 0.5
     },
     {
       text: "Thank you for your dedication to feeding our neighbors",
-      bgColor: "bg-gradient-to-br from-orange-500 via-red-500 to-pink-600",
+      bgColor: "bg-gradient-to-br from-[#8dc53e] via-[#efeb03] to-[#227d7f]", // Bright Green to Yellow to Teal
       textColor: "text-white", 
       delay: 0.7
     }
