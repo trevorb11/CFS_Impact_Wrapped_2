@@ -16,6 +16,7 @@ interface SlideLayoutProps {
   onPrevious?: () => void;
   isFirstSlide?: boolean;
   isLastSlide?: boolean;
+  useFullPage?: boolean; // New prop for full-page layout on desktop
 }
 
 // Updated color palette to use brand colors
@@ -34,7 +35,8 @@ export default function SlideLayout({
   onNext,
   onPrevious,
   isFirstSlide = false,
-  isLastSlide = false
+  isLastSlide = false,
+  useFullPage = false
 }: SlideLayoutProps) {
   const bgColor = SLIDE_COLORS[variant];
   const headerBgColor = variant === 'meals' ? 'bg-[#227d7f]' : 
@@ -42,7 +44,172 @@ export default function SlideLayout({
                         variant === 'people' || variant === 'summary' ? 'bg-[#0c4428]' : 
                         variant === 'environment' ? 'bg-[#227d7f]' : 
                         variant === 'foodRescue' ? 'bg-[#F08445]' : 'bg-[#0c4428]';
-  
+
+  // Get gradient backgrounds similar to intro slides based on variant
+  const getFullPageBg = () => {
+    switch (variant) {
+      case 'meals':
+        return 'bg-gradient-to-br from-teal-600 via-cyan-600 to-blue-700';
+      case 'people':
+        return 'bg-gradient-to-br from-green-600 via-emerald-600 to-teal-700';
+      case 'environment':
+        return 'bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700';
+      case 'donor':
+      case 'donorSummary':
+        return 'bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600';
+      case 'foodRescue':
+        return 'bg-gradient-to-br from-orange-500 via-red-500 to-pink-600';
+      default:
+        return 'bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700';
+    }
+  };
+
+  // Full-page layout for desktop, card layout for mobile
+  if (useFullPage) {
+    return (
+      <div className={`min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden ${getFullPageBg()}`}>
+        {/* Floating background circles similar to intro slides */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(15)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute rounded-full bg-white/10"
+              style={{
+                width: Math.random() * 200 + 50,
+                height: Math.random() * 200 + 50,
+                left: `${Math.random() * 120 - 10}%`,
+                top: `${Math.random() * 120 - 10}%`,
+              }}
+              animate={{
+                y: [-20, 20, -20],
+                x: [-15, 15, -15],
+                scale: [0.8, 1.2, 0.8],
+                opacity: [0.1, 0.3, 0.1],
+              }}
+              transition={{
+                duration: 6 + Math.random() * 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: Math.random() * 2,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Mobile: Card layout, Desktop: Full-page layout */}
+        <div className="w-full h-full flex flex-col items-center justify-center relative z-10">
+          {/* Mobile card (hidden on desktop) */}
+          <div className="md:hidden w-full max-w-md mx-4">
+            <Card className="w-full overflow-hidden">
+              <CardHeader className={`text-center ${headerBgColor} text-white rounded-t-lg py-4`}>
+                <CardTitle className="text-2xl font-bold text-white">{title}</CardTitle>
+                {subtitle && (
+                  <CardDescription className="text-white opacity-90">{subtitle}</CardDescription>
+                )}
+              </CardHeader>
+              
+              <CardContent className="pt-6 space-y-5 px-4">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                  className="w-full"
+                >
+                  {children}
+                </motion.div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Desktop full-page layout (hidden on mobile) */}
+          <div className="hidden md:flex flex-col items-center justify-center w-full h-full text-center px-8">
+            <motion.h1
+              className={`text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-8 ${titleClassName}`}
+              initial={{ opacity: 0, y: 50, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ 
+                duration: 1.2,
+                ease: [0.22, 1, 0.36, 1],
+                delay: 0.3
+              }}
+            >
+              {title}
+            </motion.h1>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="w-full max-w-4xl"
+            >
+              {children}
+            </motion.div>
+
+            {quote && (
+              <motion.div
+                className="mt-12 max-w-2xl"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 1.2 }}
+              >
+                <p className="text-white/90 text-lg lg:text-xl italic font-medium">
+                  "{quote}"
+                </p>
+              </motion.div>
+            )}
+          </div>
+
+          {/* Navigation buttons for desktop full-page */}
+          <div className="hidden md:flex justify-between w-full max-w-4xl mt-8 px-8">
+            {!isFirstSlide && onPrevious && (
+              <Button 
+                variant="outline" 
+                onClick={onPrevious} 
+                className="bg-white/20 border-white/30 text-white hover:bg-white/30 hover:text-white px-6 py-2 text-base"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" /> Previous
+              </Button>
+            )}
+            <div className="flex-1" />
+            {!isLastSlide && onNext && (
+              <Button 
+                variant="outline" 
+                onClick={onNext} 
+                className="bg-white/20 border-white/30 text-white hover:bg-white/30 hover:text-white px-6 py-2 text-base"
+              >
+                Next <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile navigation buttons */}
+        <div className="md:hidden absolute bottom-8 left-0 right-0 flex justify-between px-6">
+          {!isFirstSlide && onPrevious && (
+            <Button 
+              variant="outline" 
+              onClick={onPrevious} 
+              className="bg-white/20 border-white/30 text-white hover:bg-white/30 hover:text-white"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" /> Previous
+            </Button>
+          )}
+          <div className="flex-1" />
+          {!isLastSlide && onNext && (
+            <Button 
+              variant="outline" 
+              onClick={onNext} 
+              className="bg-white/20 border-white/30 text-white hover:bg-white/30 hover:text-white"
+            >
+              Next <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Fallback to original card layout
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-[#BAD9A3]/10 to-[#BAD9A3]/30 p-4 md:p-6 lg:p-8">
       <div className="w-full max-w-md md:max-w-lg lg:max-w-xl">

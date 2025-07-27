@@ -390,6 +390,7 @@ export default function TimeGivingSlide({
       onPrevious={onPrevious}
       isFirstSlide={isFirstSlide}
       isLastSlide={isLastSlide}
+      useFullPage={true}
     >
       <div className="max-w-4xl mx-auto px-3 sm:px-4">
         {isLoading ? (

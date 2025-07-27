@@ -84,6 +84,7 @@ export default function PeopleSlide({
       onPrevious={onPrevious}
       isFirstSlide={isFirstSlide}
       isLastSlide={isLastSlide}
+      useFullPage={true}
     >
       <div className="flex flex-col items-center space-y-5 relative">
         {/* Floating hearts and sparkles */}

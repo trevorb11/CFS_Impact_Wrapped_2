@@ -241,6 +241,7 @@ export default function FoodRescueSlide({
       onPrevious={onPrevious}
       isFirstSlide={isFirstSlide}
       isLastSlide={isLastSlide}
+      useFullPage={true}
     >
       <div className="mb-6 sm:mb-8 text-center relative">
         {/* Floating food and sparkle effects */}

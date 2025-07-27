@@ -52,6 +52,7 @@ export default function DonorFinancialSlide({
       onPrevious={onPrevious}
       isFirstSlide={isFirstSlide}
       isLastSlide={isLastSlide}
+      useFullPage={true}
     >
       <div className="flex flex-col items-center mb-6 relative">
         {/* Floating money and sparkle effects */}
