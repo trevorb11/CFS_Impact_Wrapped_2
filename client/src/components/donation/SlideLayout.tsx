@@ -44,7 +44,8 @@ export default function SlideLayout({
                         variant === 'people' || variant === 'summary' ? 'bg-[#0c4428]' : 
                         variant === 'environment' ? 'bg-[#f97316]' : 
                         variant === 'foodRescue' ? 'bg-[#efeb03]' : 
-                        variant === 'nutrition' ? 'bg-[#227d7f]' : 'bg-[#0c4428]';
+                        variant === 'nutrition' ? 'bg-[#227d7f]' : 
+                        variant === 'volunteer' ? 'bg-[#0c4428]' : 'bg-[#0c4428]';
 
   // Get gradient backgrounds using CFS brand colors
   const getFullPageBg = () => {
@@ -62,6 +63,10 @@ export default function SlideLayout({
         return 'bg-gradient-to-br from-[#efeb03] via-[#8dc53e] to-[#227d7f]'; // Yellow to Bright Green to Teal
       case 'nutrition':
         return 'bg-gradient-to-br from-[#227d7f] via-[#0c4428] to-[#8dc53e]'; // Teal to Dark Green to Bright Green
+      case 'volunteer':
+        return 'bg-gradient-to-br from-[#0c4428] via-[#8dc53e] to-[#00d6dd]'; // Dark Green to Bright Green to Light Blue
+      case 'summary':
+        return 'bg-gradient-to-br from-[#0c4428] via-[#227d7f] to-[#8dc53e]'; // Dark Green to Teal to Bright Green
       default:
         return 'bg-gradient-to-br from-[#0c4428] via-[#227d7f] to-[#00d6dd]'; // Dark Green to Teal to Light Blue
     }
