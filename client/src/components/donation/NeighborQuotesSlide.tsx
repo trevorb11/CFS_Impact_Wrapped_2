@@ -85,6 +85,7 @@ export default function NeighborQuotesSlide({
       onPrevious={onPrevious}
       isFirstSlide={isFirstSlide}
       isLastSlide={isLastSlide}
+      useFullPage={true}
     >
       <div className="my-4 sm:my-6 md:my-8 max-w-5xl mx-auto">
         <div className="relative h-[300px] sm:h-[350px] md:h-[420px] mb-4 sm:mb-6 md:mb-8">

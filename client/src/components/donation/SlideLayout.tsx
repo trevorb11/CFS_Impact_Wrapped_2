@@ -42,7 +42,7 @@ export default function SlideLayout({
   const headerBgColor = variant === 'meals' ? 'bg-[#227d7f]' : 
                         variant === 'donor' || variant === 'donorSummary' ? 'bg-[#0c4428]' : 
                         variant === 'people' || variant === 'summary' ? 'bg-[#0c4428]' : 
-                        variant === 'environment' ? 'bg-[#8dc53e]' : 
+                        variant === 'environment' ? 'bg-[#f97316]' : 
                         variant === 'foodRescue' ? 'bg-[#efeb03]' : 
                         variant === 'nutrition' ? 'bg-[#227d7f]' : 'bg-[#0c4428]';
 

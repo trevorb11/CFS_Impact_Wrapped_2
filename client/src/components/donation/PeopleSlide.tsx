@@ -111,7 +111,7 @@ export default function PeopleSlide({
                 delay: Math.random() * 3,
               }}
             >
-              {i % 3 === 0 ? "💚" : i % 3 === 1 ? "✨" : "🤗"}
+              {i % 3 === 0 ? "💚" : i % 3 === 1 ? "✨" : "⭐"}
             </motion.div>
           ))}
         </div>

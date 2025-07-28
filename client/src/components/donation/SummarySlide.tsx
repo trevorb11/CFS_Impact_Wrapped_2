@@ -179,6 +179,7 @@ export default function SummarySlide({
       onPrevious={onPrevious}
       isFirstSlide={isFirstSlide}
       isLastSlide={isLastSlide}
+      useFullPage={true}
     >
       <div className="flex flex-col items-center space-y-6">
         {/* Certificate-style header */}

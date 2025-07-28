@@ -137,7 +137,7 @@ export default function EnvironmentSlide({
       isLastSlide={isLastSlide}
       useFullPage={true}
     >
-      <div className="flex flex-col items-center space-y-5">
+      <div className="flex flex-col items-center space-y-5 py-8 md:py-12">
         {/* Environmental impact icon with animated effects */}
         <div className="relative">
           <motion.div
