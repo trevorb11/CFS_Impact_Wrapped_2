@@ -260,6 +260,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // API endpoint to calculate donation impact
+  app.post('/api/calculate-impact', async (req, res) => {
+    try {
+      const schema = z.object({
+        amount: z.number().min(0.01)
+      });
+
+      const { amount } = schema.parse(req.body);
+      
+      // Use the same constants as the frontend
+      const ALMANAC_CONSTANTS = {
+        mealsPerDollar: 1.52, 
+        costPerMeal: 0.66, 
+        foodRescuePerDollar: 1.83, 
+        poundsPerMeal: 1.2, 
+        peoplePerMeal: 0.328, 
+        co2PerPoundFood: 8.65, 
+        waterPerPoundFood: 45.2, 
+        foodDistribution: {
+          produce: 31.92, 
+          dairy: 21.67,   
+          protein: 18.33  
+        },
+        totalMealsProvided: 10951888, 
+        totalPeopleServed: 60000, 
+        dailyFoodRescue: 22000, 
+      };
+      
+      // Calculate donation impact metrics using the same logic as the frontend
+      const mealsProvided = Math.round(amount * ALMANAC_CONSTANTS.mealsPerDollar);
+      const peopleServed = Math.round(amount * ALMANAC_CONSTANTS.mealsPerDollar * ALMANAC_CONSTANTS.peoplePerMeal);
+      const foodRescued = Math.round(amount * ALMANAC_CONSTANTS.foodRescuePerDollar);
+      const co2Saved = Math.round(amount * ALMANAC_CONSTANTS.foodRescuePerDollar * ALMANAC_CONSTANTS.co2PerPoundFood);
+      const waterSaved = Math.round(amount * ALMANAC_CONSTANTS.foodRescuePerDollar * ALMANAC_CONSTANTS.waterPerPoundFood);
+      const peopleFed = mealsProvided < 12 ? 'a person' : 'a family of 4';
+      const daysFed = mealsProvided < 3 ? '1 day' : mealsProvided < 21 ? `${Math.round(mealsProvided / 3)} days` : 'a week';
+      
+      const impact = {
+        mealsProvided,
+        peopleServed,
+        foodRescued,
+        co2Saved,
+        waterSaved,
+        peopleFed,
+        daysFed,
+        producePercentage: ALMANAC_CONSTANTS.foodDistribution.produce,
+        dairyPercentage: ALMANAC_CONSTANTS.foodDistribution.dairy,
+        proteinPercentage: ALMANAC_CONSTANTS.foodDistribution.protein,
+        freshFoodPercentage: ALMANAC_CONSTANTS.foodDistribution.produce + ALMANAC_CONSTANTS.foodDistribution.dairy + ALMANAC_CONSTANTS.foodDistribution.protein,
+        costSavings: parseFloat((mealsProvided * ALMANAC_CONSTANTS.costPerMeal).toFixed(2)),
+        peoplePercentage: ((peopleServed / ALMANAC_CONSTANTS.totalPeopleServed) * 100).toFixed(2) + '%'
+      };
+      
+      res.json({ impact });
+    } catch (error) {
+      console.error("Error calculating donation impact:", error);
+      res.status(400).json({ error: 'Invalid donation amount' });
+    }
+  });
+
+  // API endpoint to log a donation
+  app.post('/api/log-donation', async (req, res) => {
+    try {
+      const schema = z.object({
+        amount: z.string().or(z.number()).transform(val => {
+          const num = typeof val === 'string' ? parseFloat(val) : val;
+          if (isNaN(num) || num <= 0) throw new Error('Amount must be a positive number');
+          return num;
+        }),
+        timestamp: z.string().optional(),
+        email: z.string().email().optional().or(z.literal(''))
+      });
+
+      const { amount, timestamp, email } = schema.parse(req.body);
+      
+      // Log the donation (you could save this to database if needed)
+      console.log('Donation logged:', { amount, timestamp, email });
+      
+      res.json({ 
+        success: true,
+        donation: { amount, timestamp, email },
+        message: 'Donation logged successfully'
+      });
+    } catch (error) {
+      console.error("Error logging donation:", error);
+      res.status(400).json({ error: 'Invalid donation data' });
+    }
+  });
+
   // Create http server for the application
   const server = createServer(app);
   
