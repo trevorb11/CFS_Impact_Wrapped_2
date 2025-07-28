@@ -155,8 +155,9 @@ export default function FoodRescueComparison({
       isFirstSlide={isFirstSlide}
       isLastSlide={isLastSlide}
       titleClassName="text-cfs-mobilePantry"
+      useFullPage={true}
     >
-      <div className="flex flex-col items-center space-y-6">
+      <div className="flex flex-col items-center space-y-6 py-8 md:py-12">
         {/* Animated Scale Icon */}
         <motion.div
           initial={{ scale: 0, y: 0 }}
