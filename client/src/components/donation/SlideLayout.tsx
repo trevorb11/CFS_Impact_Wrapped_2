@@ -105,7 +105,7 @@ export default function SlideLayout({
         </div>
 
         {/* Mobile: Card layout, Desktop: Full-page layout */}
-        <div className="w-full h-full flex flex-col items-center justify-center relative z-10">
+        <div className="w-full h-full flex flex-col items-center justify-between relative z-10 py-8 md:py-12 lg:py-16">
           {/* Mobile card (hidden on desktop) */}
           <div className="md:hidden w-full max-w-md mx-4">
             <Card className="w-full overflow-hidden">
@@ -130,7 +130,7 @@ export default function SlideLayout({
           </div>
 
           {/* Desktop full-page layout (hidden on mobile) */}
-          <div className="hidden md:flex flex-col items-center justify-center w-full h-full text-center px-8">
+          <div className="hidden md:flex flex-col items-center justify-center w-full flex-1 text-center px-8">
             <motion.h1
               className={`text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-8 ${titleClassName}`}
               initial={{ opacity: 0, y: 50, scale: 0.8 }}
@@ -168,7 +168,7 @@ export default function SlideLayout({
           </div>
 
           {/* Navigation buttons for desktop full-page */}
-          <div className="hidden md:flex justify-between w-full max-w-4xl mt-8 px-8">
+          <div className="hidden md:flex justify-between w-full max-w-4xl px-8">
             {!isFirstSlide && onPrevious && (
               <Button 
                 variant="outline" 
