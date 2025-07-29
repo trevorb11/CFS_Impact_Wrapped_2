@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import logoWhite from "@/assets/cfs-logo-white.png";
 
 interface IntroSlidesProps {
   donorFirstName?: string;
@@ -199,7 +200,7 @@ export default function IntroSlides({ donorFirstName, onComplete }: IntroSlidesP
               transition={{ delay: 1.5, duration: 0.8 }}
             >
               <img 
-                src="/assets/cfs-logo-white.png" 
+                src={logoWhite} 
                 alt="Community Food Share" 
                 className="h-12 sm:h-16 opacity-90"
               />
