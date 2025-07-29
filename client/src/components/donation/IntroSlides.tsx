@@ -44,7 +44,7 @@ export default function IntroSlides({ donorFirstName, onComplete }: IntroSlidesP
     },
     {
       text: "Thank you for your dedication to feeding our neighbors",
-      bgColor: "bg-gradient-to-br from-[#8dc53e] via-[#efeb03] to-[#227d7f]", // Bright Green to Yellow to Teal
+      bgColor: "bg-gradient-to-br from-[#0c4428] via-[#227d7f] to-[#414042]", // Dark Green to Teal to Dark Gray
       textColor: "text-white", 
       delay: 0.7
     }
@@ -189,6 +189,20 @@ export default function IntroSlides({ donorFirstName, onComplete }: IntroSlidesP
                   }}
                 />
               ))}
+            </motion.div>
+
+            {/* Community Food Share Logo */}
+            <motion.div
+              className="absolute bottom-8 left-8 right-8 flex justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.5, duration: 0.8 }}
+            >
+              <img 
+                src="/assets/cfs-logo-white.png" 
+                alt="Community Food Share" 
+                className="h-12 sm:h-16 opacity-90"
+              />
             </motion.div>
 
             {/* Skip button (subtle) */}
