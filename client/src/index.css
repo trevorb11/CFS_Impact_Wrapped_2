@@ -53,6 +53,29 @@
     font-size: 16px;
   }
   
+  /* Mobile touch optimization */
+  button, .clickable {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Prevent zoom on focus for iOS */
+  @media screen and (max-width: 768px) {
+    input, textarea, select {
+      font-size: 16px !important;
+    }
+  }
+  
+  /* Improve mobile scrolling */
+  html {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Fix mobile 100vh issues */
+  .full-height-mobile {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+  
   /* Mobile scaling and overflow control */
   @media screen and (max-width: 768px) {
     body {

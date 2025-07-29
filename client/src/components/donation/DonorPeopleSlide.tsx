@@ -75,7 +75,7 @@ export default function DonorPeopleSlide({
       isLastSlide={isLastSlide}
       useFullPage={true}
     >
-      <div className="flex flex-col items-center mb-6 py-8 md:py-12">
+      <div className="flex flex-col items-center mb-4 py-4 md:py-12">
         <motion.div
           initial={{ scale: 0, rotate: -180 }}
           animate={{ scale: 1, rotate: 0 }}
@@ -105,10 +105,10 @@ export default function DonorPeopleSlide({
       </div>
       
       {/* People visualization */}
-      <div className="w-full h-16 bg-[#e0f0ea] rounded-lg mb-6 relative overflow-hidden">
+      <div className="w-full h-12 md:h-16 bg-[#e0f0ea] rounded-lg mb-4 md:mb-6 relative overflow-hidden">
         <div 
           ref={peopleRef} 
-          className="h-16 rounded-lg flex items-center justify-start overflow-hidden"
+          className="h-12 md:h-16 rounded-lg flex items-center justify-start overflow-hidden"
           style={{ width: '0%' }}
         >
           <div className="flex flex-wrap p-2">
@@ -137,22 +137,22 @@ export default function DonorPeopleSlide({
       </motion.div>
       
       <motion.div
-        className="space-y-4"
+        className="space-y-3 md:space-y-4"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
         <motion.div 
-          className="bg-white p-4 rounded-lg shadow-sm border border-gray-100"
+          className="bg-white p-3 md:p-4 rounded-lg shadow-sm border border-gray-100"
           variants={itemVariants}
         >
           <div className="flex items-start">
-            <div className="bg-[#e0f0ea] p-2 rounded-full mr-3">
+            <div className="bg-[#e0f0ea] p-2 rounded-full mr-3 flex-shrink-0">
               <UserCheck className="h-5 w-5 text-[#0c4428]" />
             </div>
-            <div>
-              <h4 className="font-medium text-[#414042]">Community Impact</h4>
-              <p className="text-sm text-gray-600">
+            <div className="min-w-0">
+              <h4 className="font-medium text-[#414042] text-sm md:text-base">Community Impact</h4>
+              <p className="text-xs md:text-sm text-gray-600">
                 You're helping feed vulnerable populations including children, seniors, and working families
               </p>
             </div>
@@ -160,16 +160,16 @@ export default function DonorPeopleSlide({
         </motion.div>
         
         <motion.div 
-          className="bg-white p-4 rounded-lg shadow-sm border border-gray-100"
+          className="bg-white p-3 md:p-4 rounded-lg shadow-sm border border-gray-100"
           variants={itemVariants}
         >
           <div className="flex items-start">
-            <div className="bg-[#e0f0ea] p-2 rounded-full mr-3">
+            <div className="bg-[#e0f0ea] p-2 rounded-full mr-3 flex-shrink-0">
               <HandHeart className="h-5 w-5 text-[#0c4428]" />
             </div>
-            <div>
-              <h4 className="font-medium text-[#414042]">Dignity & Respect</h4>
-              <p className="text-sm text-gray-600">
+            <div className="min-w-0">
+              <h4 className="font-medium text-[#414042] text-sm md:text-base">Dignity & Respect</h4>
+              <p className="text-xs md:text-sm text-gray-600">
                 Your support helps provide dignified access to nutritious food for people facing food insecurity
               </p>
             </div>

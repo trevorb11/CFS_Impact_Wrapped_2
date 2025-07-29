@@ -392,7 +392,7 @@ export default function TimeGivingSlide({
       isLastSlide={isLastSlide}
       useFullPage={true}
     >
-      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-8 md:py-12">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-2 md:py-12">
         {isLoading ? (
           <div className="text-center p-4 sm:p-6 md:p-8">
             <div className="animate-spin h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-3 sm:mb-4"></div>

@@ -105,26 +105,50 @@ export default function SlideLayout({
         </div>
 
         {/* Mobile: Card layout, Desktop: Full-page layout */}
-        <div className="w-full h-full flex flex-col items-center justify-between relative z-10 py-8 md:py-12 lg:py-16">
-          {/* Mobile card (hidden on desktop) */}
-          <div className="md:hidden w-full max-w-md mx-4">
-            <Card className="w-full overflow-hidden">
-              <CardHeader className={`text-center ${headerBgColor} text-white rounded-t-lg py-4`}>
+        <div className="w-full h-full flex flex-col items-center justify-between relative z-10 py-4 md:py-12 lg:py-16">
+          {/* Mobile card layout (hidden on desktop) */}
+          <div className="md:hidden w-full max-w-md mx-4 flex flex-col min-h-0 flex-1">
+            <Card className="w-full overflow-hidden flex flex-col flex-1">
+              <CardHeader className={`text-center ${headerBgColor} text-white rounded-t-lg py-4 flex-shrink-0`}>
                 <CardTitle className="text-2xl font-bold text-white">{title}</CardTitle>
                 {subtitle && (
                   <CardDescription className="text-white opacity-90">{subtitle}</CardDescription>
                 )}
               </CardHeader>
               
-              <CardContent className="pt-6 space-y-5 px-4">
+              <CardContent className="pt-4 space-y-4 px-4 flex-1 flex flex-col">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.3 }}
-                  className="w-full"
+                  className="w-full flex-1"
                 >
                   {children}
                 </motion.div>
+                
+                {/* Mobile navigation inside card */}
+                <div className="flex justify-between pt-4 mt-auto flex-shrink-0">
+                  {!isFirstSlide && onPrevious ? (
+                    <Button 
+                      variant="outline" 
+                      onClick={onPrevious} 
+                      className="text-sm px-4 py-2"
+                    >
+                      <ArrowLeft className="mr-1 h-4 w-4" /> Previous
+                    </Button>
+                  ) : (
+                    <div />
+                  )}
+                  {!isLastSlide && onNext && (
+                    <Button 
+                      variant="default" 
+                      onClick={onNext} 
+                      className="text-sm px-4 py-2"
+                    >
+                      Next <ArrowRight className="ml-1 h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -191,28 +215,7 @@ export default function SlideLayout({
           </div>
         </div>
 
-        {/* Mobile navigation buttons */}
-        <div className="md:hidden absolute bottom-8 left-0 right-0 flex justify-between px-6">
-          {!isFirstSlide && onPrevious && (
-            <Button 
-              variant="outline" 
-              onClick={onPrevious} 
-              className="bg-white/20 border-white/30 text-white hover:bg-white/30 hover:text-white"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" /> Previous
-            </Button>
-          )}
-          <div className="flex-1" />
-          {!isLastSlide && onNext && (
-            <Button 
-              variant="outline" 
-              onClick={onNext} 
-              className="bg-white/20 border-white/30 text-white hover:bg-white/30 hover:text-white"
-            >
-              Next <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          )}
-        </div>
+
       </div>
     );
   }
