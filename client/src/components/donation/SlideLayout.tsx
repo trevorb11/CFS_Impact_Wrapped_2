@@ -126,34 +126,29 @@ export default function SlideLayout({
                   {children}
                 </motion.div>
                 
-                {/* Mobile navigation inside card - Always show for debugging */}
-                <div className="flex justify-between pt-4 mt-auto flex-shrink-0 bg-gray-100 p-2 rounded">
-                  {onPrevious ? (
+                {/* Mobile navigation inside card */}
+                <div className="flex justify-between pt-4 mt-auto flex-shrink-0">
+                  {onPrevious && !isFirstSlide ? (
                     <Button 
                       variant="outline" 
                       onClick={onPrevious} 
                       className="text-sm px-4 py-2 min-h-[44px]"
-                      disabled={isFirstSlide}
                     >
                       <ArrowLeft className="mr-1 h-4 w-4" /> Previous
                     </Button>
                   ) : (
-                    <div className="text-xs text-gray-500">No prev</div>
+                    <div className="w-20" />
                   )}
-                  <div className="text-xs text-gray-500 flex items-center">
-                    {isFirstSlide ? "First" : ""} {isLastSlide ? "Last" : ""}
-                  </div>
-                  {onNext ? (
+                  {onNext && !isLastSlide ? (
                     <Button 
-                      variant="default" 
+                      variant="outline" 
                       onClick={onNext} 
                       className="text-sm px-4 py-2 min-h-[44px]"
-                      disabled={isLastSlide}
                     >
                       Next <ArrowRight className="ml-1 h-4 w-4" />
                     </Button>
                   ) : (
-                    <div className="text-xs text-gray-500">No next</div>
+                    <div className="w-20" />
                   )}
                 </div>
               </CardContent>
@@ -221,8 +216,57 @@ export default function SlideLayout({
               </Button>
             )}
           </div>
+
+          {/* Side arrow navigation */}
+          {!isFirstSlide && onPrevious && (
+            <button
+              onClick={onPrevious}
+              className="fixed left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all duration-200 z-20"
+              aria-label="Previous slide"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+          )}
+          
+          {!isLastSlide && onNext && (
+            <button
+              onClick={onNext}
+              className="fixed right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all duration-200 z-20"
+              aria-label="Next slide"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          )}
         </div>
 
+        {/* Mobile side arrow navigation */}
+        {!isFirstSlide && onPrevious && (
+          <button
+            onClick={onPrevious}
+            className="md:hidden fixed left-2 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-200 z-20"
+            aria-label="Previous slide"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+        )}
+        
+        {!isLastSlide && onNext && (
+          <button
+            onClick={onNext}
+            className="md:hidden fixed right-2 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-200 z-20"
+            aria-label="Next slide"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        )}
 
       </div>
     );
