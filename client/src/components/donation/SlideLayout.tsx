@@ -132,7 +132,7 @@ export default function SlideLayout({
                     <Button 
                       variant="outline" 
                       onClick={onPrevious} 
-                      className="text-sm px-4 py-2"
+                      className="text-sm px-4 py-2 min-h-[44px]"
                     >
                       <ArrowLeft className="mr-1 h-4 w-4" /> Previous
                     </Button>
@@ -143,7 +143,7 @@ export default function SlideLayout({
                     <Button 
                       variant="default" 
                       onClick={onNext} 
-                      className="text-sm px-4 py-2"
+                      className="text-sm px-4 py-2 min-h-[44px]"
                     >
                       Next <ArrowRight className="ml-1 h-4 w-4" />
                     </Button>
@@ -193,21 +193,22 @@ export default function SlideLayout({
 
           {/* Navigation buttons for desktop full-page */}
           <div className="hidden md:flex justify-between w-full max-w-4xl px-8">
-            {!isFirstSlide && onPrevious && (
+            {!isFirstSlide && onPrevious ? (
               <Button 
                 variant="outline" 
                 onClick={onPrevious} 
-                className="bg-white/20 border-white/30 text-white hover:bg-white/30 hover:text-white px-6 py-2 text-base"
+                className="bg-white/20 border-white/30 text-white hover:bg-white/30 hover:text-white px-6 py-2 text-base min-h-[44px]"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" /> Previous
               </Button>
+            ) : (
+              <div />
             )}
-            <div className="flex-1" />
             {!isLastSlide && onNext && (
               <Button 
                 variant="outline" 
                 onClick={onNext} 
-                className="bg-white/20 border-white/30 text-white hover:bg-white/30 hover:text-white px-6 py-2 text-base"
+                className="bg-white/20 border-white/30 text-white hover:bg-white/30 hover:text-white px-6 py-2 text-base min-h-[44px]"
               >
                 Next <ArrowRight className="ml-2 h-4 w-4" />
               </Button>

@@ -192,9 +192,9 @@ export default function IntroSlides({ donorFirstName, onComplete }: IntroSlidesP
               ))}
             </motion.div>
 
-            {/* Community Food Share Logo */}
+            {/* Community Food Share Logo - positioned below progress dots */}
             <motion.div
-              className="absolute bottom-8 left-8 right-8 flex justify-center"
+              className="flex justify-center mt-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.5, duration: 0.8 }}
