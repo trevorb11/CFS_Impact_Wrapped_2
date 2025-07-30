@@ -126,27 +126,34 @@ export default function SlideLayout({
                   {children}
                 </motion.div>
                 
-                {/* Mobile navigation inside card */}
-                <div className="flex justify-between pt-4 mt-auto flex-shrink-0">
-                  {!isFirstSlide && onPrevious ? (
+                {/* Mobile navigation inside card - Always show for debugging */}
+                <div className="flex justify-between pt-4 mt-auto flex-shrink-0 bg-gray-100 p-2 rounded">
+                  {onPrevious ? (
                     <Button 
                       variant="outline" 
                       onClick={onPrevious} 
                       className="text-sm px-4 py-2 min-h-[44px]"
+                      disabled={isFirstSlide}
                     >
                       <ArrowLeft className="mr-1 h-4 w-4" /> Previous
                     </Button>
                   ) : (
-                    <div />
+                    <div className="text-xs text-gray-500">No prev</div>
                   )}
-                  {!isLastSlide && onNext && (
+                  <div className="text-xs text-gray-500 flex items-center">
+                    {isFirstSlide ? "First" : ""} {isLastSlide ? "Last" : ""}
+                  </div>
+                  {onNext ? (
                     <Button 
                       variant="default" 
                       onClick={onNext} 
                       className="text-sm px-4 py-2 min-h-[44px]"
+                      disabled={isLastSlide}
                     >
                       Next <ArrowRight className="ml-1 h-4 w-4" />
                     </Button>
+                  ) : (
+                    <div className="text-xs text-gray-500">No next</div>
                   )}
                 </div>
               </CardContent>
